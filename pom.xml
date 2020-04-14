@@ -1,0 +1,112 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>de.mortensenit</groupId>
+	<artifactId>scc</artifactId>
+	<name>Storage Control Center</name>
+	<version>0.0.1-SNAPSHOT</version>
+	<description>Storage Control Center is an application for managing microstream datastorages.</description>
+
+	<contributors>
+		<contributor>
+			<name>Frederik Mortensen</name>
+			<organization>IT Service Mortensen</organization>
+			<organizationUrl>www.java-nachhilfe.de</organizationUrl>
+			<roles>
+				<role>Architect</role>
+				<role>Developer</role>
+			</roles>
+			<timezone>UTC+1</timezone>
+			<email>info@java-nachhilfe.de</email>
+		</contributor>
+	</contributors>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>microstream-releases</id>
+			<url>https://repo.microstream.one/repository/maven-public</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+
+		<!-- JavaFX -->
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-controls</artifactId>
+			<version>14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openjfx</groupId>
+			<artifactId>javafx-fxml</artifactId>
+			<version>14</version>
+		</dependency>
+
+		<!-- MicroStream -->
+		<dependency>
+			<groupId>one.microstream</groupId>
+			<artifactId>storage.embedded</artifactId>
+			<version>02.01.00-MS-GA</version>
+		</dependency>
+
+		<dependency>
+			<groupId>one.microstream</groupId>
+			<artifactId>storage.embedded.configuration</artifactId>
+			<version>02.01.00-MS-GA</version>
+		</dependency>
+
+		<!-- Logging -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-api</artifactId>
+			<version>2.13.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-core</artifactId>
+			<version>2.13.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.13.0</version>
+		</dependency>
+
+		<!-- Unit testing -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.openjfx</groupId>
+				<artifactId>javafx-maven-plugin</artifactId>
+				<version>0.0.4</version>
+				<configuration>
+					<mainClass>de.mortensenit.SCCFXStarter</mainClass>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.8.0</version>
+				<configuration>
+					<release>11</release>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
