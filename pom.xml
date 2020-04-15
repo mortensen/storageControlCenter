@@ -51,13 +51,13 @@
 		<dependency>
 			<groupId>one.microstream</groupId>
 			<artifactId>storage.embedded</artifactId>
-			<version>02.01.00-MS-GA</version>
+			<version>02.02.01-MS-GA</version>
 		</dependency>
 
 		<dependency>
 			<groupId>one.microstream</groupId>
 			<artifactId>storage.embedded.configuration</artifactId>
-			<version>02.01.00-MS-GA</version>
+			<version>02.02.01-MS-GA</version>
 		</dependency>
 
 		<!-- Logging -->

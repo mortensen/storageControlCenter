@@ -1,5 +1,6 @@
 package de.mortensenit.persistence;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -9,7 +10,17 @@ import java.util.List;
  */
 public class DataRoot {
 
-	private List<DataStorageProfile> profiles = null;
+	private Date created;
+
+	private List<DataStorageProfile> profiles;
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date created) {
+		this.created = created;
+	}
 
 	public List<DataStorageProfile> getProfiles() {
 		return this.profiles;

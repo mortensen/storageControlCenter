@@ -5,7 +5,7 @@ import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import one.microstream.persistence.lazy.LazyReferenceManager;
+import one.microstream.reference.LazyReferenceManager;
 import one.microstream.storage.configuration.Configuration;
 import one.microstream.storage.types.EmbeddedStorageManager;
 

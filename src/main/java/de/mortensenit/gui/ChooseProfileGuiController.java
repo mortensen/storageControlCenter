@@ -135,10 +135,10 @@ public class ChooseProfileGuiController {
 		String[] profileNames = null;
 		
 		DataRoot dataRoot = PersistenceController.getInstance().root();
-		if (dataRoot.getProfiles() != null && dataRoot.getProfiles().size() > 0) {
+		if (dataRoot != null && dataRoot.getProfiles() != null && dataRoot.getProfiles().size() > 0) {
 			profileNames = new String[dataRoot.getProfiles().size()];
 			for (int i = 0; i < dataRoot.getProfiles().size(); i++) {
-				profileNames[i] = dataRoot.getProfiles().get(i).getName();
+				profileNames[i] = dataRoot.getProfiles().get(i).getProfileName();
 			}
 		}
 		

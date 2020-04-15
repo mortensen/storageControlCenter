@@ -8,18 +8,18 @@ package de.mortensenit.persistence;
  */
 public class DataStorageProfile {
 
-	private String name;
+	private String profileName;
 
 	private String jarPath;
 
 	private String dataRootClassName;
 
-	public String getName() {
-		return this.name;
+	public String getProfileName() {
+		return profileName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
 	}
 
 	public String getJarPath() {
@@ -45,7 +45,7 @@ public class DataStorageProfile {
 
 	@Override
 	public String toString() {
-		return getName();
+		return getProfileName();
 	}
 
 }
