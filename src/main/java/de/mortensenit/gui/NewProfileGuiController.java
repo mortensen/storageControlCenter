@@ -11,12 +11,12 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 /**
- * Simple gui controller for the edit profile dialogue
+ * Simple gui controller for the new profile dialogue
  * 
  * @author frederik.mortensen
  *
  */
-public class EditProfileGuiController {
+public class NewProfileGuiController {
 
 	private Logger logger = LoggerFactory.getLogger(getClass().getName());
 

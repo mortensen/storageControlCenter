@@ -167,10 +167,6 @@ public class ChooseProfileGuiController {
 
 			addRepeatingSideImage(newRoot);
 
-			ScrollPane scrollPane = (ScrollPane) newRoot.lookup("#scrollPane");
-			Parent profile = FXMLLoader.load(getClass().getResource("/scenes/profile.fxml"));
-			scrollPane.setContent(profile);
-			
 			newStage.setOnCloseRequest(e -> {
 				newStage.hide();
 				Node node = (Node) (event.getSource());
@@ -202,10 +198,6 @@ public class ChooseProfileGuiController {
 
 			addRepeatingSideImage(editRoot);
 
-			ScrollPane scrollPane = (ScrollPane) editRoot.lookup("#scrollPane");
-			Parent profile = FXMLLoader.load(getClass().getResource("/scenes/profile.fxml"));
-			scrollPane.setContent(profile);
-			
 			editStage.setOnCloseRequest(e -> {
 				editStage.hide();
 				Node node = (Node) (event.getSource());
