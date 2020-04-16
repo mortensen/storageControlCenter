@@ -37,6 +37,7 @@ public class ProfileController {
 		if (dataRoot != null) {
 			if (dataRoot.getProfiles() != null) {
 				if (dataRoot.getProfiles().size() > 0) {
+					logger.info("Profiles found:" + dataRoot.getProfiles().size());
 					profileNames = new String[dataRoot.getProfiles().size()];
 					for (int i = 0; i < dataRoot.getProfiles().size(); i++) {
 						profileNames[i] = dataRoot.getProfiles().get(i).getProfileName();
@@ -59,11 +60,15 @@ public class ProfileController {
 	 */
 	public void save(DataStorageProfile profile) {
 		List<DataStorageProfile> profiles = persistenceController.root().getProfiles();
-		if (profiles == null)
+		if (profiles == null) {
+			logger.info("Initializing new profile list as they were null");
 			profiles = new ArrayList<DataStorageProfile>();
+		}
 		profiles.add(profile);
 		persistenceController.root().setProfiles(profiles);
 		persistenceController.getStorageManager().storeRoot();
+		persistenceController.getStorageManager().store(profiles);
+
 	}
 
 	/**
@@ -72,14 +77,31 @@ public class ProfileController {
 	 */
 	public void update(DataStorageProfile profile) {
 		List<DataStorageProfile> profiles = persistenceController.root().getProfiles();
-		if (profiles == null)
+		if (profiles == null) {
 			profiles = new ArrayList<DataStorageProfile>();
-		DataStorageProfile current = profiles.stream().filter(e -> e.getProfileName().equals(profile.getProfileName()))
-				.findFirst().get();
-		profiles.remove(current);
-		profiles.add(profile);
-		persistenceController.root().setProfiles(profiles);
-		persistenceController.getStorageManager().storeRoot();
+			logger.info("No entries yet. Creating new entry.");
+			profiles.add(profile);
+			persistenceController.root().setProfiles(profiles);
+			persistenceController.getStorageManager().storeRoot();
+			persistenceController.getStorageManager().store(profiles);
+		} else {
+			DataStorageProfile current = profiles.stream()
+					.filter(e -> e.getProfileName().equals(profile.getProfileName())).findFirst().orElse(null);
+			if (current != null) {
+				logger.info("Entry for update found");
+				profiles.remove(current);
+				profiles.add(profile);
+				persistenceController.root().setProfiles(profiles);
+				persistenceController.getStorageManager().storeRoot();
+				persistenceController.getStorageManager().store(profiles);
+			} else {
+				logger.info("Inserting a new entry, because I didn't find anything to update.");
+				profiles.add(profile);
+				persistenceController.root().setProfiles(profiles);
+				persistenceController.getStorageManager().storeRoot();
+				persistenceController.getStorageManager().store(profiles);
+			}
+		}
 	}
 
 }
