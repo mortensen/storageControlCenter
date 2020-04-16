@@ -3,6 +3,8 @@ package de.mortensenit.persistence;
 import java.util.Date;
 import java.util.List;
 
+import de.mortensenit.model.DataStorageProfile;
+
 /**
  * Root class for all objects that will be serialized with microstream.
  * 

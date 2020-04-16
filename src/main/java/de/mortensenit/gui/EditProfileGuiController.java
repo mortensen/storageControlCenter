@@ -3,6 +3,8 @@ package de.mortensenit.gui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.mortensenit.model.DataStorageProfile;
+import de.mortensenit.persistence.ProfileController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -34,12 +36,20 @@ public class EditProfileGuiController {
 
 	@FXML
 	private Button backButton;
+	
+	private ProfileController profileController = new ProfileController();
 
 	@FXML
 	public void handleSaveButton(ActionEvent event) {
 
 		logger.info(
-				"Persisting " + profileName.getText() + ", " + jarPath.getText() + ", " + dataRootClassName.getText());
+				"Updating " + profileName.getText() + ", " + jarPath.getText() + ", " + dataRootClassName.getText());
+		
+		DataStorageProfile profile = new DataStorageProfile();
+		profile.setProfileName(profileName.getText());
+		profile.setJarPath(jarPath.getText());
+		profile.setDataRootClassName(dataRootClassName.getText());
+		profileController.update(profile);
 
 		Node source = (Node) event.getSource();
 		Stage currentStage = (Stage) source.getScene().getWindow();

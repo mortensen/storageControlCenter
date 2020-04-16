@@ -1,4 +1,4 @@
-package de.mortensenit.persistence;
+package de.mortensenit.model;
 
 /**
  * Model representation for serialized microstream storage configurations.
