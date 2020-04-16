@@ -50,6 +50,7 @@ public class PersistenceController {
 	 * load datastore and setup initial values if it's created the first time
 	 */
 	public void initDatastore() {
+		logger.info("Initializing datastore...");
 		initDatastore("microstream/scc");
 	}
 

@@ -7,7 +7,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.stage.Window;
+import javafx.stage.Stage;
 
 /**
  * Simple gui controller for the about dialogue
@@ -24,8 +24,8 @@ public class AboutGuiController {
 	@FXML
 	public void handleCloseButton(ActionEvent event) {
 		Node source = (Node) event.getSource();
-		Window stage = source.getScene().getWindow();
-		stage.hide();
+		Stage stage = (Stage) source.getScene().getWindow();
+		stage.close();
 	}
 
 }

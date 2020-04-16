@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import de.mortensenit.gui.ChooseProfileGuiController;
 import de.mortensenit.persistence.PersistenceController;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -61,4 +62,5 @@ public class SCCFXStarter extends Application {
 
 		logger.info("=== Datastore startup finished successfully: " + LocalDateTime.now() + " ===");
 	}
+
 }

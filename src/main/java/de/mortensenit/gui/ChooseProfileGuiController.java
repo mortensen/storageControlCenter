@@ -5,8 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.mortensenit.persistence.DataRoot;
-import de.mortensenit.persistence.PersistenceController;
+import de.mortensenit.persistence.ProfileController;
 import javafx.animation.PauseTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -40,7 +39,7 @@ import javafx.util.Duration;
  *
  */
 public class ChooseProfileGuiController {
-	
+
 	private Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	@FXML
@@ -64,6 +63,8 @@ public class ChooseProfileGuiController {
 	@FXML
 	private MenuItem aboutMenuItem;
 
+	private ProfileController profileController = new ProfileController();
+
 	/**
 	 * make the transistion from splash screen to profile chooser dialogue
 	 * 
@@ -77,7 +78,7 @@ public class ChooseProfileGuiController {
 		});
 		pause.play();
 	}
-	
+
 	/**
 	 * open the profile chooser dialogue
 	 * 
@@ -88,7 +89,7 @@ public class ChooseProfileGuiController {
 		Stage currentStage = (Stage) node.getScene().getWindow();
 		openProfileChooserDialogue(currentStage);
 	}
-	
+
 	/**
 	 * open the profile chooser dialogue
 	 * 
@@ -103,8 +104,13 @@ public class ChooseProfileGuiController {
 			loadProfileList(chooseProfileRoot);
 			chooseProfileStage.setScene(chooseProfileScene);
 			chooseProfileStage.setTitle("Storage Control Center - Profil auswählen");
+			
+			chooseProfileStage.setOnCloseRequest(e -> {
+				System.exit(0);
+			});
+			
 			chooseProfileStage.show();
-			currentStage.hide();
+			currentStage.close();
 		} catch (IOException e) {
 			logger.error("", e.getMessage());
 			e.printStackTrace();
@@ -132,17 +138,9 @@ public class ChooseProfileGuiController {
 	 * @param root
 	 */
 	private void loadProfileList(Parent root) {
-		String[] profileNames = null;
-		
-		DataRoot dataRoot = PersistenceController.getInstance().root();
-		if (dataRoot != null && dataRoot.getProfiles() != null && dataRoot.getProfiles().size() > 0) {
-			profileNames = new String[dataRoot.getProfiles().size()];
-			for (int i = 0; i < dataRoot.getProfiles().size(); i++) {
-				profileNames[i] = dataRoot.getProfiles().get(i).getProfileName();
-			}
-		}
-		
-		
+
+		String[] profileNames = profileController.getProfileNames();
+
 		ScrollPane scrollPane = (ScrollPane) root.lookup("#scrollPane");
 		ListView<String> listView = new ListView<String>();
 		if (profileNames != null) {
@@ -172,6 +170,13 @@ public class ChooseProfileGuiController {
 			ScrollPane scrollPane = (ScrollPane) newRoot.lookup("#scrollPane");
 			Parent profile = FXMLLoader.load(getClass().getResource("/scenes/profile.fxml"));
 			scrollPane.setContent(profile);
+			
+			newStage.setOnCloseRequest(e -> {
+				newStage.hide();
+				Node node = (Node) (event.getSource());
+				Stage stage = (Stage)node.getScene().getWindow();
+				stage.show();
+			});
 
 			hideCurrentWindow(event);
 			newStage.show();
@@ -200,7 +205,15 @@ public class ChooseProfileGuiController {
 			ScrollPane scrollPane = (ScrollPane) editRoot.lookup("#scrollPane");
 			Parent profile = FXMLLoader.load(getClass().getResource("/scenes/profile.fxml"));
 			scrollPane.setContent(profile);
+			
+			editStage.setOnCloseRequest(e -> {
+				editStage.hide();
+				Node node = (Node) (event.getSource());
+				Stage stage = (Stage)node.getScene().getWindow();
+				stage.show();
+			});
 
+			
 			hideCurrentWindow(event);
 			editStage.show();
 		} catch (IOException e) {
@@ -242,6 +255,10 @@ public class ChooseProfileGuiController {
 			TreeView<String> treeView = new TreeView<String>();
 			treeView.setRoot(rootItem);
 			treeScrollPane.setContent(treeView);
+			
+			showDataStoreContentStage.setOnCloseRequest(e -> {
+				System.exit(0);
+			});
 
 			showDataStoreContentStage.show();
 			hideCurrentWindow(event);
@@ -266,7 +283,7 @@ public class ChooseProfileGuiController {
 	 */
 	@FXML
 	public void handleCloseButton(ActionEvent event) {
-		System.exit(0);
+		quit();
 	}
 
 	/**
@@ -274,7 +291,7 @@ public class ChooseProfileGuiController {
 	 */
 	@FXML
 	public void handleFileExitMenuItem() {
-		System.exit(0);
+		quit();
 	}
 
 	/**
@@ -307,6 +324,12 @@ public class ChooseProfileGuiController {
 		Node node = (Node) (event.getSource());
 		Window window = node.getScene().getWindow();
 		window.hide();
+	}
+	
+	@FXML
+	public void quit() {
+		logger.info("System.exit(0);");
+		System.exit(0);
 	}
 
 }
