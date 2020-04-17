@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.mortensenit.model.DataStorageProfile;
+import de.mortensenit.persistence.PersistenceController;
 import de.mortensenit.persistence.ProfileController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -78,7 +79,17 @@ public class EditProfileGuiController {
 	}
 
 	public void setProfile(DataStorageProfile profile) {
+		logger.info("Try: " + profile.getProfileName());
 		this.profile = profile;
+		DataStorageProfile persistentProfile = PersistenceController.getInstance().root().getProfiles().stream()
+				.filter(e -> e.getProfileName().equals(profile.getProfileName())).findFirst().orElse(null);
+		if (persistentProfile != null) {
+			this.profileName.setText(persistentProfile.getProfileName());
+			this.jarPath.setText(persistentProfile.getJarPath());
+			this.dataRootClassName.setText(persistentProfile.getDataRootClassName());
+		} else {
+			logger.error("Not found");
+		}
 	}
 
 }

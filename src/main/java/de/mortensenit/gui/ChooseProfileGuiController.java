@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.mortensenit.model.DataStorageProfile;
 import de.mortensenit.persistence.ProfileController;
 import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
@@ -64,8 +65,6 @@ public class ChooseProfileGuiController {
 
 	@FXML
 	private MenuItem aboutMenuItem;
-
-	private String currentSelectedProfile;
 
 	private ProfileController profileController = new ProfileController();
 
@@ -147,6 +146,7 @@ public class ChooseProfileGuiController {
 
 		ScrollPane scrollPane = (ScrollPane) root.lookup("#scrollPane");
 		ListView<String> listView = new ListView<String>();
+		listView.setId("profilesListView");
 		if (profileNames != null) {
 			ObservableList<String> items = FXCollections.observableArrayList(profileNames);
 			listView.setItems(items);
@@ -156,7 +156,7 @@ public class ChooseProfileGuiController {
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
 				logger.info("Selected: " + newValue);
-				currentSelectedProfile = newValue;
+				root.setUserData(newValue);
 			}
 		});
 		VBox vbox = new VBox(listView);
@@ -202,7 +202,20 @@ public class ChooseProfileGuiController {
 	public void handleEditButton(ActionEvent event) {
 		try {
 			Stage editStage = new Stage();
-			Parent editRoot = FXMLLoader.load(getClass().getResource("/scenes/editProfile.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/editProfile.fxml"));
+			Parent editRoot = loader.load();
+			
+			EditProfileGuiController controller = loader.getController();
+			DataStorageProfile profile = new DataStorageProfile();
+			
+			Node tempNode = (Node) (event.getSource());
+			Scene scene = (Scene) tempNode.getScene();
+			ListView<String> listView = (ListView<String>)scene.lookup("#profilesListView");
+			String profileName = listView.getSelectionModel().getSelectedItem();
+
+			profile.setProfileName(profileName);
+			controller.setProfile(profile);
+
 			Scene editScene = new Scene(editRoot, 800, 600);
 			editStage.setScene(editScene);
 			editStage.setTitle("Storage Control Center - Profil bearbeiten");
