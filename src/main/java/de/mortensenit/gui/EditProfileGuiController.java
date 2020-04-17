@@ -36,15 +36,21 @@ public class EditProfileGuiController {
 
 	@FXML
 	private Button backButton;
-	
+
+	private DataStorageProfile profile;
+
 	private ProfileController profileController = new ProfileController();
 
+	/**
+	 * 
+	 * @param event
+	 */
 	@FXML
 	public void handleSaveButton(ActionEvent event) {
 
 		logger.info(
 				"Updating " + profileName.getText() + ", " + jarPath.getText() + ", " + dataRootClassName.getText());
-		
+
 		DataStorageProfile profile = new DataStorageProfile();
 		profile.setProfileName(profileName.getText());
 		profile.setJarPath(jarPath.getText());
@@ -56,11 +62,23 @@ public class EditProfileGuiController {
 		new ChooseProfileGuiController().openProfileChooserDialogue(currentStage);
 	}
 
+	/**
+	 * 
+	 * @param event
+	 */
 	@FXML
 	public void handleBackButton(ActionEvent event) {
 		Node source = (Node) event.getSource();
 		Stage currentStage = (Stage) source.getScene().getWindow();
 		new ChooseProfileGuiController().openProfileChooserDialogue(currentStage);
+	}
+
+	public DataStorageProfile getProfile() {
+		return profile;
+	}
+
+	public void setProfile(DataStorageProfile profile) {
+		this.profile = profile;
 	}
 
 }

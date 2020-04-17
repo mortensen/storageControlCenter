@@ -7,6 +7,8 @@ import org.slf4j.LoggerFactory;
 
 import de.mortensenit.persistence.ProfileController;
 import javafx.animation.PauseTransition;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -63,6 +65,8 @@ public class ChooseProfileGuiController {
 	@FXML
 	private MenuItem aboutMenuItem;
 
+	private String currentSelectedProfile;
+
 	private ProfileController profileController = new ProfileController();
 
 	/**
@@ -104,11 +108,11 @@ public class ChooseProfileGuiController {
 			loadProfileList(chooseProfileRoot);
 			chooseProfileStage.setScene(chooseProfileScene);
 			chooseProfileStage.setTitle("Storage Control Center - Profil auswählen");
-			
+
 			chooseProfileStage.setOnCloseRequest(e -> {
 				System.exit(0);
 			});
-			
+
 			chooseProfileStage.show();
 			currentStage.close();
 		} catch (IOException e) {
@@ -148,6 +152,13 @@ public class ChooseProfileGuiController {
 			listView.setItems(items);
 		}
 		listView.setPadding(new Insets(5, 5, 5, 5));
+		listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+				logger.info("Selected: " + newValue);
+				currentSelectedProfile = newValue;
+			}
+		});
 		VBox vbox = new VBox(listView);
 		scrollPane.setContent(vbox);
 	}
@@ -170,7 +181,7 @@ public class ChooseProfileGuiController {
 			newStage.setOnCloseRequest(e -> {
 				newStage.hide();
 				Node node = (Node) (event.getSource());
-				Stage stage = (Stage)node.getScene().getWindow();
+				Stage stage = (Stage) node.getScene().getWindow();
 				stage.show();
 			});
 
@@ -201,11 +212,10 @@ public class ChooseProfileGuiController {
 			editStage.setOnCloseRequest(e -> {
 				editStage.hide();
 				Node node = (Node) (event.getSource());
-				Stage stage = (Stage)node.getScene().getWindow();
+				Stage stage = (Stage) node.getScene().getWindow();
 				stage.show();
 			});
 
-			
 			hideCurrentWindow(event);
 			editStage.show();
 		} catch (IOException e) {
@@ -247,7 +257,7 @@ public class ChooseProfileGuiController {
 			TreeView<String> treeView = new TreeView<String>();
 			treeView.setRoot(rootItem);
 			treeScrollPane.setContent(treeView);
-			
+
 			showDataStoreContentStage.setOnCloseRequest(e -> {
 				System.exit(0);
 			});
@@ -317,7 +327,7 @@ public class ChooseProfileGuiController {
 		Window window = node.getScene().getWindow();
 		window.hide();
 	}
-	
+
 	@FXML
 	public void quit() {
 		logger.info("System.exit(0);");
