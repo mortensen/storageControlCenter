@@ -10,29 +10,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Simple util class for fileystem io stuff.
+ * Simple util class for fileystem IO stuff.
  * 
  * @author frederik.mortensen
  *
  */
 public class FileSystemUtils {
-	
+
 	private static Logger logger = LoggerFactory.getLogger(FileSystemUtils.class.getName());
-	
+
 	/**
+	 * Deletes a directory
 	 * 
-	 * @param file
+	 * @param file the directory to delete
 	 * @throws IOException
 	 */
 	public static void deleteDirectory(File file) throws IOException {
+		logger.info("Deleting directory " + file.getAbsolutePath());
 		Path path = Path.of(file.getAbsolutePath());
 		deleteDirectory(path);
 	}
 
 	/**
-	 * recursive deletion of path
+	 * Recursive deletion of path
 	 * 
-	 * @param path
+	 * @param path the path that should be deleted
 	 * @throws IOException
 	 */
 	public static void deleteDirectory(Path path) throws IOException {

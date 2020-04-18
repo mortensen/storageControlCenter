@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.mortensenit.gui.JavaFXHelper;
 import de.mortensenit.model.DataStorageProfile;
 
 /**
@@ -28,8 +29,10 @@ public class ProfileController {
 	}
 
 	/**
+	 * Loads the persistent profiles from the datastore and returns a list of their
+	 * profile names.
 	 * 
-	 * @return
+	 * @return an arry of profileNames
 	 */
 	public String[] getProfileNames() {
 		String[] profileNames = null;
@@ -43,20 +46,22 @@ public class ProfileController {
 						profileNames[i] = dataRoot.getProfiles().get(i).getProfileName();
 					}
 				} else {
-					logger.error("Pofile waren leer");
+					logger.info("Profiles list was empty.");
 				}
 			} else {
-				logger.error("Profile waren null");
+				logger.info("No profiles found.");
 			}
 		} else {
-			logger.error("DataRoot war null");
+			logger.error("DataRoot was null!");
+			JavaFXHelper.quit();
 		}
 		return profileNames;
 	}
 
 	/**
+	 * Insert a new profile into the datastore
 	 * 
-	 * @param profile
+	 * @param profile the datastore profile that needs to be persisted
 	 */
 	public void save(DataStorageProfile profile) {
 		List<DataStorageProfile> profiles = persistenceController.root().getProfiles();
@@ -68,15 +73,21 @@ public class ProfileController {
 		persistenceController.root().setProfiles(profiles);
 		persistenceController.getStorageManager().storeRoot();
 		persistenceController.getStorageManager().store(profiles);
-
 	}
 
 	/**
+	 * Update an existing profile in the datastore
 	 * 
-	 * @param profile
+	 * @param profile the datastore profile that needs to be updated
 	 */
 	public void update(DataStorageProfile profile) {
-		List<DataStorageProfile> profiles = persistenceController.root().getProfiles();
+		if (PersistenceController.getInstance().root() == null) {
+			logger.error("Error while trying to retrieve dataRoot");
+			JavaFXHelper.quit();
+		}
+
+		List<DataStorageProfile> profiles = PersistenceController.getInstance().root().getProfiles();
+		
 		if (profiles == null) {
 			profiles = new ArrayList<DataStorageProfile>();
 			logger.info("No entries yet. Creating new entry.");

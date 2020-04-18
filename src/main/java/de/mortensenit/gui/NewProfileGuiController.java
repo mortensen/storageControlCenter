@@ -7,7 +7,6 @@ import de.mortensenit.model.DataStorageProfile;
 import de.mortensenit.persistence.ProfileController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
@@ -39,11 +38,20 @@ public class NewProfileGuiController {
 	
 	private ProfileController profileController = new ProfileController();
 	
+	/**
+	 * Adding a new profile entry and persisting it via controller.
+	 * @param event triggerd by button
+	 */
 	@FXML
 	public void handleSaveButton(ActionEvent event) {
-
-		logger.info(
-				"Inserting " + profileName.getText() + ", " + jarPath.getText() + ", " + dataRootClassName.getText());
+		StringBuffer logOutput = new StringBuffer();
+		logOutput.append("Inserting profile ");
+		logOutput.append(profileName.getText());
+		logOutput.append(" and jar path ");
+		logOutput.append(jarPath.getText());
+		logOutput.append(" and root class ");
+		logOutput.append(dataRootClassName.getText());
+		logger.info(logOutput.toString());
 		
 		DataStorageProfile profile = new DataStorageProfile();
 		profile.setProfileName(profileName.getText());
@@ -51,15 +59,17 @@ public class NewProfileGuiController {
 		profile.setDataRootClassName(dataRootClassName.getText());
 		profileController.save(profile);
 
-		Node source = (Node) event.getSource();
-		Stage currentStage = (Stage) source.getScene().getWindow();
+		Stage currentStage = JavaFXHelper.getStageFromEvent(event);
 		new ChooseProfileGuiController().openProfileChooserDialogue(currentStage);
 	}
 
+	/**
+	 * Navigate back to the chooseProfile dialogue.
+	 * @param event triggered by button
+	 */
 	@FXML
 	public void handleBackButton(ActionEvent event) {
-		Node source = (Node) event.getSource();
-		Stage currentStage = (Stage) source.getScene().getWindow();
+		Stage currentStage = JavaFXHelper.getStageFromEvent(event);
 		new ChooseProfileGuiController().openProfileChooserDialogue(currentStage);
 	}
 

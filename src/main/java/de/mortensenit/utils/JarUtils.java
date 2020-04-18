@@ -13,18 +13,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * TODO: needs quality check
  * Simple util class for everything java archive dependent.
  * 
  * @author frederik.mortensen
  *
  */
 public class JarUtils {
-	
+
 	private static Logger logger = LoggerFactory.getLogger(JarUtils.class.getName());
 
 	/**
+	 * Get the top stack entries of the class tree.
 	 * 
-	 * @param jarName
+	 * @param jarName the jar file containing the datastore classes
 	 * @return
 	 * @throws Exception
 	 */
@@ -35,8 +37,9 @@ public class JarUtils {
 	}
 
 	/**
+	 * TODO: documentation
 	 * 
-	 * @param jarName
+	 * @param jarName the jar file containing the datastore classes
 	 * @return
 	 * @throws Exception
 	 */
@@ -61,6 +64,7 @@ public class JarUtils {
 	}
 
 	/**
+	 * TODO: documentation
 	 * 
 	 * @param jarName
 	 * @param urlClassLoader

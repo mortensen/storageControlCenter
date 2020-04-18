@@ -37,6 +37,8 @@ import javafx.stage.Window;
 import javafx.util.Duration;
 
 /**
+ * This dialogue shows a list of managed microstream profiles, that can be
+ * created, edited, opened and deleted.
  * 
  * @author frederik.mortensen
  *
@@ -71,10 +73,10 @@ public class ChooseProfileGuiController {
 	/**
 	 * make the transistion from splash screen to profile chooser dialogue
 	 * 
-	 * @param splashStage
+	 * @param splashStage the source screen
 	 */
 	public void transistToProfileChooserDialogue(Stage splashStage) {
-		// wait 3 seconds, then switch from splash to chooseProfile view
+		// Wait n seconds, then switch from splash screen to chooseProfile view
 		PauseTransition pause = new PauseTransition(Duration.seconds(1));
 		pause.setOnFinished(event -> {
 			openProfileChooserDialogue(splashStage);
@@ -85,50 +87,51 @@ public class ChooseProfileGuiController {
 	/**
 	 * open the profile chooser dialogue
 	 * 
-	 * @param splashStage
+	 * @param event triggered by button
 	 */
 	public void openProfileChooserDialogue(ActionEvent event) {
-		Node node = (Node) (event.getSource());
-		Stage currentStage = (Stage) node.getScene().getWindow();
+		Stage currentStage = JavaFXHelper.getStageFromEvent(event);
 		openProfileChooserDialogue(currentStage);
 	}
 
 	/**
 	 * open the profile chooser dialogue
 	 * 
-	 * @param currentStage
+	 * @param currentStage the source stage to navigate away from
 	 */
 	public void openProfileChooserDialogue(Stage currentStage) {
+		Stage chooseProfileStage = new Stage();
+		Parent chooseProfileRoot = null;
+
 		try {
-			Stage chooseProfileStage = new Stage();
-			Parent chooseProfileRoot = FXMLLoader.load(getClass().getResource("/scenes/chooseProfile.fxml"));
-			Scene chooseProfileScene = new Scene(chooseProfileRoot, 800, 600);
-			addRepeatingSideImage(chooseProfileRoot);
-			loadProfileList(chooseProfileRoot);
-			chooseProfileStage.setScene(chooseProfileScene);
-			chooseProfileStage.setTitle("Storage Control Center - Profil auswählen");
-
-			chooseProfileStage.setOnCloseRequest(e -> {
-				System.exit(0);
-			});
-
-			chooseProfileStage.show();
-			currentStage.close();
+			chooseProfileRoot = FXMLLoader.load(getClass().getResource(SceneConstants.CHOOSE_PROFILE));
 		} catch (IOException e) {
-			logger.error("", e.getMessage());
-			e.printStackTrace();
-			System.exit(0);
+			logger.error("This scene could not be loaded! " + SceneConstants.CHOOSE_PROFILE, e.getMessage());
+			JavaFXHelper.quit();
 		}
+
+		Scene chooseProfileScene = new Scene(chooseProfileRoot, 800, 600);
+		addRepeatingSideImage(chooseProfileRoot);
+		loadProfileList(chooseProfileRoot);
+		chooseProfileStage.setScene(chooseProfileScene);
+		chooseProfileStage.setTitle("Storage Control Center - Profil auswählen");
+
+		chooseProfileStage.setOnCloseRequest(e -> {
+			JavaFXHelper.quit();
+		});
+
+		chooseProfileStage.show();
+		currentStage.close();
 	}
 
 	/**
 	 * add repeatable graphic to the left
 	 * 
-	 * @param root
+	 * @param root the stage to add the image to
 	 */
 	private void addRepeatingSideImage(Parent root) {
 		VBox leftVBox = (VBox) root.lookup("#leftVBox");
-		Image sideLogoImage = new Image(getClass().getResourceAsStream("/images/sidelogo.png"));
+		Image sideLogoImage = new Image(getClass().getResourceAsStream(ResourceConstants.IMAGE_SIDELOGO));
 		BackgroundSize backgroundSize = new BackgroundSize(100, 100, true, true, true, false);
 		BackgroundImage backgroundImage = new BackgroundImage(sideLogoImage, BackgroundRepeat.REPEAT,
 				BackgroundRepeat.REPEAT, BackgroundPosition.DEFAULT, backgroundSize);
@@ -136,9 +139,9 @@ public class ChooseProfileGuiController {
 	}
 
 	/**
-	 * load profiles and add them to the list
+	 * load profiles and add them to the list view
 	 * 
-	 * @param root
+	 * @param root the target stage where the data will get into
 	 */
 	private void loadProfileList(Parent root) {
 
@@ -147,141 +150,171 @@ public class ChooseProfileGuiController {
 		ScrollPane scrollPane = (ScrollPane) root.lookup("#scrollPane");
 		ListView<String> listView = new ListView<String>();
 		listView.setId("profilesListView");
+
 		if (profileNames != null) {
+			// set items from database
 			ObservableList<String> items = FXCollections.observableArrayList(profileNames);
 			listView.setItems(items);
 		}
+
 		listView.setPadding(new Insets(5, 5, 5, 5));
 		listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
 			@Override
 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-				logger.info("Selected: " + newValue);
+				logger.debug("Selected: " + newValue);
+				// set selected item into window user data
 				root.setUserData(newValue);
 			}
+
 		});
 		VBox vbox = new VBox(listView);
 		scrollPane.setContent(vbox);
 	}
 
 	/**
+	 * open the new profile dialogue
 	 * 
-	 * @param event
+	 * @param event triggered by a button
 	 */
 	@FXML
 	public void handleNewButton(ActionEvent event) {
+		Stage newStage = new Stage();
+		Parent newRoot = null;
+
 		try {
-			Stage newStage = new Stage();
-			Parent newRoot = FXMLLoader.load(getClass().getResource("/scenes/newProfile.fxml"));
-			Scene newScene = new Scene(newRoot, 800, 600);
-			newStage.setScene(newScene);
-			newStage.setTitle("Storage Control Center - Neues Profil anlegen");
-
-			addRepeatingSideImage(newRoot);
-
-			newStage.setOnCloseRequest(e -> {
-				newStage.hide();
-				Node node = (Node) (event.getSource());
-				Stage stage = (Stage) node.getScene().getWindow();
-				stage.show();
-			});
-
-			hideCurrentWindow(event);
-			newStage.show();
+			newRoot = FXMLLoader.load(getClass().getResource(SceneConstants.NEW_PROFILE));
 		} catch (IOException e) {
-			logger.error("", e.getMessage());
-			e.printStackTrace();
-			System.exit(0);
+			logger.error("This scene could not be loaded!" + SceneConstants.NEW_PROFILE, e.getMessage());
+			JavaFXHelper.quit();
 		}
+
+		Scene newScene = new Scene(newRoot, 800, 600);
+		newStage.setScene(newScene);
+		newStage.setTitle("Storage Control Center - Neues Profil anlegen");
+
+		addRepeatingSideImage(newRoot);
+
+		newStage.setOnCloseRequest(e -> {
+			Stage stage = JavaFXHelper.getStageFromEvent(event);
+			stage.show();
+			newStage.hide();
+		});
+
+		newStage.show();
+		hideCurrentWindow(event);
 	}
 
 	/**
+	 * open the edit profile dialogue
 	 * 
-	 * @param event
+	 * @param event triggerd by a button
 	 */
 	@FXML
 	public void handleEditButton(ActionEvent event) {
+		Stage editStage = new Stage();
+		Parent editRoot = null;
+		EditProfileGuiController editProfileGuiController = null;
+
 		try {
-			Stage editStage = new Stage();
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("/scenes/editProfile.fxml"));
-			Parent editRoot = loader.load();
-			
-			EditProfileGuiController controller = loader.getController();
-			DataStorageProfile profile = new DataStorageProfile();
-			
-			Node tempNode = (Node) (event.getSource());
-			Scene scene = (Scene) tempNode.getScene();
-			ListView<String> listView = (ListView<String>)scene.lookup("#profilesListView");
-			String profileName = listView.getSelectionModel().getSelectedItem();
-
-			profile.setProfileName(profileName);
-			controller.setProfile(profile);
-
-			Scene editScene = new Scene(editRoot, 800, 600);
-			editStage.setScene(editScene);
-			editStage.setTitle("Storage Control Center - Profil bearbeiten");
-
-			addRepeatingSideImage(editRoot);
-
-			editStage.setOnCloseRequest(e -> {
-				editStage.hide();
-				Node node = (Node) (event.getSource());
-				Stage stage = (Stage) node.getScene().getWindow();
-				stage.show();
-			});
-
-			hideCurrentWindow(event);
-			editStage.show();
+			// initalize the controller to be able to set data into the target view
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneConstants.EDIT_PROFILE));
+			editRoot = loader.load();
+			editProfileGuiController = loader.getController();
 		} catch (IOException e) {
-			logger.error("", e.getMessage());
-			e.printStackTrace();
-			System.exit(0);
+			logger.error("This scene could not be loaded! " + SceneConstants.EDIT_PROFILE, e.getMessage());
+			JavaFXHelper.quit();
 		}
+
+		// find the list view to be able to get the selected item
+		Scene scene = JavaFXHelper.getSceneFromEvent(event);
+		ListView<?> listView = null;
+		Node profilesListViewNode = scene.lookup("#profilesListView");
+		if (profilesListViewNode instanceof ListView<?>) {
+			listView = (ListView<?>) profilesListViewNode;
+		} else {
+			logger.error("Could not find profilesListView node. " + profilesListViewNode);
+			JavaFXHelper.quit();
+		}
+
+		// generate a profile with the selected item and set it into the controller
+		String profileName = (String) listView.getSelectionModel().getSelectedItem();
+
+		DataStorageProfile profile = new DataStorageProfile();
+		profile.setProfileName(profileName);
+		editProfileGuiController.setProfile(profile);
+
+		Scene editScene = new Scene(editRoot, 800, 600);
+		editStage.setScene(editScene);
+		editStage.setTitle("Storage Control Center - Profil bearbeiten");
+
+		addRepeatingSideImage(editRoot);
+
+		editStage.setOnCloseRequest(e -> {
+			Stage chooseProfileStage = JavaFXHelper.getStageFromEvent(event);
+			chooseProfileStage.show();
+			editStage.hide();
+		});
+
+		editStage.show();
+		hideCurrentWindow(event);
+	}
+
+	/**
+	 * open the main dialogue to show the datastore content
+	 * 
+	 * @param event triggered by a button
+	 */
+	@FXML
+	public void handleOpenButton(ActionEvent event) {
+		Stage showDataStoreContentStage = new Stage();
+		Parent showDataStoreContentRoot = null;
+
+		try {
+			showDataStoreContentRoot = FXMLLoader.load(getClass().getResource(SceneConstants.SHOW_DATASTORE_CONTENT));
+		} catch (IOException e) {
+			logger.error("This scene could not be loaded! " + SceneConstants.SHOW_DATASTORE_CONTENT, e.getMessage());
+			JavaFXHelper.quit();
+		}
+
+		Scene showDataStoreContentScene = new Scene(showDataStoreContentRoot, 800, 600);
+		showDataStoreContentStage.setScene(showDataStoreContentScene);
+		// TODO: Fake Daten im Titel
+		showDataStoreContentStage.setTitle("Storage Control Center - DEV");
+		TreeView<String> treeView = generateTreeView();
+		ScrollPane treeScrollPane = (ScrollPane) showDataStoreContentRoot.lookup("#treeScrollPane");
+		treeScrollPane.setContent(treeView);
+
+		showDataStoreContentStage.setOnCloseRequest(e -> {
+			JavaFXHelper.quit();
+		});
+
+		showDataStoreContentStage.show();
+		hideCurrentWindow(event);
 	}
 
 	/**
 	 * 
-	 * @param event
+	 * @return
 	 */
-	@FXML
-	public void handleOpenButton(ActionEvent event) {
-		try {
-			Stage showDataStoreContentStage = new Stage();
-			Parent showDataStoreContentRoot = FXMLLoader
-					.load(getClass().getResource("/scenes/showDataStoreContent.fxml"));
-			Scene showDataStoreContentScene = new Scene(showDataStoreContentRoot, 800, 600);
-			showDataStoreContentStage.setScene(showDataStoreContentScene);
-			// TODO: Dummy Wert
-			showDataStoreContentStage.setTitle("Storage Control Center - DEV");
+	private TreeView<String> generateTreeView() {
+		logger.debug("Loading tree...");
+		// TODO: Fake Daten
+		TreeItem<String> rootItem = new TreeItem<String>("DataStore", null);
+		rootItem.setExpanded(true);
 
-			// TODO: Fake Daten
-			TreeItem<String> rootItem = new TreeItem<String>("DataStore", null);
-			rootItem.setExpanded(true);
+		TreeItem<String> item = new TreeItem<String>("Users");
+		rootItem.getChildren().add(item);
 
-			TreeItem<String> item = new TreeItem<String>("Users");
-			rootItem.getChildren().add(item);
+		TreeItem<String> item2 = new TreeItem<String>("Contacts");
+		rootItem.getChildren().add(item2);
 
-			TreeItem<String> item2 = new TreeItem<String>("Contacts");
-			rootItem.getChildren().add(item2);
+		TreeItem<String> item3 = new TreeItem<String>("Addresses");
+		rootItem.getChildren().add(item3);
 
-			TreeItem<String> item3 = new TreeItem<String>("Addresses");
-			rootItem.getChildren().add(item3);
-
-			ScrollPane treeScrollPane = (ScrollPane) showDataStoreContentRoot.lookup("#treeScrollPane");
-			TreeView<String> treeView = new TreeView<String>();
-			treeView.setRoot(rootItem);
-			treeScrollPane.setContent(treeView);
-
-			showDataStoreContentStage.setOnCloseRequest(e -> {
-				System.exit(0);
-			});
-
-			showDataStoreContentStage.show();
-			hideCurrentWindow(event);
-		} catch (IOException e) {
-			logger.error("", e.getMessage());
-			e.printStackTrace();
-			System.exit(0);
-		}
+		TreeView<String> treeView = new TreeView<String>();
+		treeView.setRoot(rootItem);
+		return treeView;
 	}
 
 	/**
@@ -290,61 +323,59 @@ public class ChooseProfileGuiController {
 	 */
 	@FXML
 	public void handleDeleteButton(ActionEvent event) {
+		// TODO: add delete functionality
 	}
 
 	/**
-	 * 
-	 * @param event
+	 * @see #quit()
+	 * @param event triggered by a button
 	 */
 	@FXML
 	public void handleCloseButton(ActionEvent event) {
-		quit();
+		JavaFXHelper.quit();
 	}
 
 	/**
-	 * 
+	 * @see #quit()
 	 */
 	@FXML
 	public void handleFileExitMenuItem() {
-		quit();
+		JavaFXHelper.quit();
 	}
 
 	/**
+	 * shows the about software dialogue as modal
 	 * 
-	 * @param event
+	 * @param event triggered by a button
 	 */
 	@FXML
 	public void handleAboutMenuItem(ActionEvent event) {
+		Stage aboutStage = null;
+		Parent aboutRoot = null;
 		try {
-			Stage aboutStage = new Stage();
-			Parent aboutRoot = FXMLLoader.load(getClass().getResource("/scenes/about.fxml"));
-			Scene aboutScene = new Scene(aboutRoot, 800, 400);
-			aboutStage.setResizable(false);
-			aboutStage.setAlwaysOnTop(true);
-			aboutStage.setScene(aboutScene);
-			aboutStage.setTitle("Über SCC");
-			aboutStage.show();
+			aboutStage = new Stage();
+			aboutRoot = FXMLLoader.load(getClass().getResource(SceneConstants.ABOUT_DIALOGUE));
 		} catch (IOException e) {
-			logger.error("", e.getMessage());
-			e.printStackTrace();
-			System.exit(0);
+			logger.error("This scene could not be loaded! " + SceneConstants.ABOUT_DIALOGUE, e.getMessage());
+			JavaFXHelper.quit();
 		}
+		Scene aboutScene = new Scene(aboutRoot, 800, 400);
+		aboutStage.setResizable(false);
+		aboutStage.setAlwaysOnTop(true);
+		aboutStage.setScene(aboutScene);
+		aboutStage.setTitle("Über SCC");
+		aboutStage.show();
 	}
 
 	/**
+	 * used whenever a new scene is opened and the current stage should be hidden
 	 * 
-	 * @param event
+	 * @param event triggered by a button
 	 */
 	private void hideCurrentWindow(ActionEvent event) {
 		Node node = (Node) (event.getSource());
 		Window window = node.getScene().getWindow();
 		window.hide();
-	}
-
-	@FXML
-	public void quit() {
-		logger.info("System.exit(0);");
-		System.exit(0);
 	}
 
 }

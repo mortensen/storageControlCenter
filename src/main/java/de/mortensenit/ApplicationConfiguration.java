@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * TODO: needs quality check<br />
  * Wrapper for the filesystem configuration.
  * 
  * @author frederik.mortensen

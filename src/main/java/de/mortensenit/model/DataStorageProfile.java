@@ -45,7 +45,14 @@ public class DataStorageProfile {
 
 	@Override
 	public String toString() {
-		return getProfileName();
+		StringBuffer stringBuffer = new StringBuffer();
+		stringBuffer.append("ProfileName: ");
+		stringBuffer.append(profileName);
+		stringBuffer.append(", Jar Path: ");
+		stringBuffer.append(jarPath);
+		stringBuffer.append(", dataRootClassName: ");
+		stringBuffer.append(dataRootClassName);
+		return stringBuffer.toString();
 	}
 
 }

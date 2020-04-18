@@ -51,6 +51,7 @@ public class PersistenceController {
 	 */
 	public void initDatastore() {
 		logger.info("Initializing datastore...");
+		// TODO: maybe make configurable
 		initDatastore("microstream/scc");
 	}
 
@@ -58,7 +59,6 @@ public class PersistenceController {
 	 * load datastore and setup initial values if it's created the first time
 	 * 
 	 * @param datastorePath the filesystem path where the datastore is persisted
-	 * @param datastoreName the name you chose to give your datastore
 	 */
 	public void initDatastore(String datastorePath) {
 
@@ -100,10 +100,17 @@ public class PersistenceController {
 	/**
 	 * fetch main data container
 	 * 
-	 * @return the main data container objectd
+	 * @return the main data container object
 	 */
 	public DataRoot root() {
 		return storageManager != null ? (DataRoot) storageManager.root() : null;
+	}
+
+	/**
+	 * closing the dataStore
+	 */
+	public void shutdown() {
+		storageManager.shutdown();
 	}
 
 }
