@@ -92,6 +92,7 @@ public class ProfileController {
 			logger.info("No entries yet. Creating new entry.");
 			profiles.add(profile);
 			persistenceController.root().setProfiles(profiles);
+			persistenceController.getStorageManager().store(profiles);
 			persistenceController.getStorageManager().storeRoot();
 		} else {
 			DataStorageProfile current = profiles.stream()
@@ -103,11 +104,14 @@ public class ProfileController {
 				profiles.remove(current);
 				profiles.add(profile);
 				persistenceController.root().setProfiles(profiles);
+				persistenceController.getStorageManager().store(profiles);
 				persistenceController.getStorageManager().storeRoot();
 			} else {
 				logger.info("Inserting a new entry, because I didn't find anything to update.");
 				profiles.add(profile);
 				persistenceController.root().setProfiles(profiles);
+				persistenceController.getStorageManager().store(profiles);
+				persistenceController.getStorageManager().storeRoot();
 			}
 		}
 	}

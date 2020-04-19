@@ -3,6 +3,7 @@ package de.mortensenit.gui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.mortensenit.model.DataStorageProfile;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -16,7 +17,7 @@ import javafx.scene.control.MenuItem;
  *
  */
 public class DataStoreContentGuiController {
-	
+
 	private Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 	@FXML
@@ -31,8 +32,11 @@ public class DataStoreContentGuiController {
 	@FXML
 	private Button closeButton;
 
+	private DataStorageProfile dataStoreaDataStorageProfile;
+
 	/**
 	 * Navigates back to chooseProfile dialogue.
+	 * 
 	 * @param event triggered by button
 	 */
 	@FXML
@@ -64,11 +68,20 @@ public class DataStoreContentGuiController {
 
 	/**
 	 * Quit the application.
+	 * 
 	 * @param event triggered by button
 	 */
 	@FXML
 	private void handleCloseButton(ActionEvent event) {
 		JavaFXHelper.quit();
+	}
+
+	public DataStorageProfile getDataStoreaDataStorageProfile() {
+		return dataStoreaDataStorageProfile;
+	}
+
+	public void setDataStoreaDataStorageProfile(DataStorageProfile dataStoreaDataStorageProfile) {
+		this.dataStoreaDataStorageProfile = dataStoreaDataStorageProfile;
 	}
 
 }

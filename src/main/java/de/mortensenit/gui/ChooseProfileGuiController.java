@@ -228,22 +228,8 @@ public class ChooseProfileGuiController {
 
 		// find the list view to be able to get the selected item
 		Scene scene = JavaFXHelper.getSceneFromEvent(event);
-		ListView<?> listView = null;
-		Node profilesListViewNode = scene.lookup("#profilesListView");
-		if (profilesListViewNode instanceof ListView<?>) {
-			listView = (ListView<?>) profilesListViewNode;
-		} else {
-			logger.error("Could not find profilesListView node. " + profilesListViewNode);
-			JavaFXHelper.quit();
-		}
-
-		// generate a profile with the selected item and set it into the controller
-		String profileName = (String) listView.getSelectionModel().getSelectedItem();
-
-		DataStorageProfile profile = new DataStorageProfile();
-		profile.setProfileName(profileName);
-		profile.setPersistentProfileName(profileName);
-		editProfileGuiController.setProfile(profile);
+		DataStorageProfile selectedProfile = fetchSelectedProfile(scene);
+		editProfileGuiController.setProfile(selectedProfile);
 
 		Scene editScene = new Scene(editRoot, 800, 600);
 		editStage.setScene(editScene);
@@ -270,20 +256,30 @@ public class ChooseProfileGuiController {
 	public void handleOpenButton(ActionEvent event) {
 		Stage showDataStoreContentStage = new Stage();
 		Parent showDataStoreContentRoot = null;
+		DataStoreContentGuiController dataStoreContentGuiController = null;
 
 		try {
-			showDataStoreContentRoot = FXMLLoader.load(getClass().getResource(SceneConstants.SHOW_DATASTORE_CONTENT));
+			// initalize the controller to be able to set data into the target view
+			FXMLLoader loader = new FXMLLoader(getClass().getResource(SceneConstants.SHOW_DATASTORE_CONTENT));
+			showDataStoreContentRoot = loader.load();
+			dataStoreContentGuiController = loader.getController();
 		} catch (IOException e) {
 			logger.error("This scene could not be loaded! " + SceneConstants.SHOW_DATASTORE_CONTENT, e);
 			JavaFXHelper.quit();
 		}
+		
+		// find the list view to be able to get the selected item
+		Scene scene = JavaFXHelper.getSceneFromEvent(event);
+		DataStorageProfile selectedProfile = fetchSelectedProfile(scene);
+		dataStoreContentGuiController.setDataStoreaDataStorageProfile(selectedProfile);
 
 		Scene showDataStoreContentScene = new Scene(showDataStoreContentRoot, 800, 600);
 		showDataStoreContentStage.setScene(showDataStoreContentScene);
-		// TODO: Fake Daten im Titel
-		showDataStoreContentStage.setTitle("Storage Control Center - DEV");
-		TreeView<String> treeView = generateTreeView();
+		showDataStoreContentStage.setTitle("Storage Control Center - " + selectedProfile.getProfileName());
+
+		//build tree
 		ScrollPane treeScrollPane = (ScrollPane) showDataStoreContentRoot.lookup("#treeScrollPane");
+		TreeView<String> treeView = generateTreeView();
 		treeScrollPane.setContent(treeView);
 
 		showDataStoreContentStage.setOnCloseRequest(e -> {
@@ -377,6 +373,32 @@ public class ChooseProfileGuiController {
 		Node node = (Node) (event.getSource());
 		Window window = node.getScene().getWindow();
 		window.hide();
+	}
+
+	/**
+	 * check which element was selected and generate a profile that can be processed
+	 * (like i.e. edited or opened)
+	 * 
+	 * @param scene
+	 * @return
+	 */
+	private DataStorageProfile fetchSelectedProfile(Scene scene) {
+		ListView<?> listView = null;
+		Node profilesListViewNode = scene.lookup("#profilesListView");
+		if (profilesListViewNode instanceof ListView<?>) {
+			listView = (ListView<?>) profilesListViewNode;
+		} else {
+			logger.error("Could not find profilesListView node. " + profilesListViewNode);
+			JavaFXHelper.quit();
+		}
+
+		// generate a profile with the selected item and set it into the controller
+		String profileName = (String) listView.getSelectionModel().getSelectedItem();
+
+		DataStorageProfile profile = new DataStorageProfile();
+		profile.setProfileName(profileName);
+		profile.setPersistentProfileName(profileName);
+		return profile;
 	}
 
 }

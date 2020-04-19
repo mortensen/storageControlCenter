@@ -2,6 +2,12 @@
  * Java jigsaw modularization
  */
 module scc {
+	
+	//needed exports
+	exports de.mortensenit to javafx.graphics;
+	exports de.mortensenit.gui to javafx.fxml;
+	exports de.mortensenit.model to javafx.fxml;
+	opens de.mortensenit.gui to javafx.fxml;
 
 	// javafx
 	requires transitive javafx.base;
@@ -18,11 +24,5 @@ module scc {
 
 	// microstream
 	requires one.microstream.all;
-
-	//needed exports
-	exports de.mortensenit to javafx.graphics;
-	exports de.mortensenit.gui to javafx.fxml;
-	exports de.mortensenit.model to javafx.fxml;
-	opens de.mortensenit.gui to javafx.fxml;
 
 }

@@ -60,7 +60,6 @@ public class EditProfileGuiController {
 		logOutput.append(dataRootClassName.getText());
 		logger.info(logOutput.toString());
 
-		DataStorageProfile profile = new DataStorageProfile();
 		profile.setProfileName(profileName.getText());
 		profile.setJarPath(jarPath.getText());
 		profile.setDataRootClassName(dataRootClassName.getText());
