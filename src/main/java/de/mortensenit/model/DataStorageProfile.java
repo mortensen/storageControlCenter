@@ -14,6 +14,12 @@ public class DataStorageProfile {
 
 	private String dataRootClassName;
 
+	/**
+	 * In case of a profile update we need the old name to find it in the database
+	 * as primary key
+	 */
+	private transient String persistentProfileName;
+
 	public String getProfileName() {
 		return profileName;
 	}
@@ -36,6 +42,14 @@ public class DataStorageProfile {
 
 	public void setDataRootClassName(String dataRootClassName) {
 		this.dataRootClassName = dataRootClassName;
+	}
+
+	public String getPersistentProfileName() {
+		return persistentProfileName;
+	}
+
+	public void setPersistentProfileName(String persistentProfileName) {
+		this.persistentProfileName = persistentProfileName;
 	}
 
 	@Override

@@ -242,6 +242,7 @@ public class ChooseProfileGuiController {
 
 		DataStorageProfile profile = new DataStorageProfile();
 		profile.setProfileName(profileName);
+		profile.setPersistentProfileName(profileName);
 		editProfileGuiController.setProfile(profile);
 
 		Scene editScene = new Scene(editRoot, 800, 600);
