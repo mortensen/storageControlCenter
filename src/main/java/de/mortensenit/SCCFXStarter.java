@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.mortensenit.gui.ChooseProfileGuiController;
+import de.mortensenit.gui.SceneConstants;
 import de.mortensenit.persistence.PersistenceController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -24,6 +25,14 @@ public class SCCFXStarter extends Application {
 	private Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 //	private ApplicationConfiguration config;
+	
+	/**
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		Application.launch(args);
+	}
 
 	/**
 	 * Main entry point for the application
@@ -32,7 +41,7 @@ public class SCCFXStarter extends Application {
 	 */
 	@Override
 	public void start(Stage splashStage) throws Exception {
-		Parent splashRoot = FXMLLoader.load(getClass().getResource("/scenes/splash.fxml"));
+		Parent splashRoot = FXMLLoader.load(getClass().getResource(SceneConstants.SPLASH_DIALOGUE));
 		Scene scene = new Scene(splashRoot, 800, 400);
 		splashStage.setResizable(false);
 		splashStage.setTitle("Storage Control Center");

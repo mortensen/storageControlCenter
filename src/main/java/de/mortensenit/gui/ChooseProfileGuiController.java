@@ -106,7 +106,7 @@ public class ChooseProfileGuiController {
 		try {
 			chooseProfileRoot = FXMLLoader.load(getClass().getResource(SceneConstants.CHOOSE_PROFILE));
 		} catch (IOException e) {
-			logger.error("This scene could not be loaded! " + SceneConstants.CHOOSE_PROFILE, e.getMessage());
+			logger.error("This scene could not be loaded! " + SceneConstants.CHOOSE_PROFILE, e);
 			JavaFXHelper.quit();
 		}
 
@@ -185,7 +185,7 @@ public class ChooseProfileGuiController {
 		try {
 			newRoot = FXMLLoader.load(getClass().getResource(SceneConstants.NEW_PROFILE));
 		} catch (IOException e) {
-			logger.error("This scene could not be loaded!" + SceneConstants.NEW_PROFILE, e.getMessage());
+			logger.error("This scene could not be loaded!" + SceneConstants.NEW_PROFILE, e);
 			JavaFXHelper.quit();
 		}
 
@@ -222,7 +222,7 @@ public class ChooseProfileGuiController {
 			editRoot = loader.load();
 			editProfileGuiController = loader.getController();
 		} catch (IOException e) {
-			logger.error("This scene could not be loaded! " + SceneConstants.EDIT_PROFILE, e.getMessage());
+			logger.error("This scene could not be loaded! " + SceneConstants.EDIT_PROFILE, e);
 			JavaFXHelper.quit();
 		}
 
@@ -274,7 +274,7 @@ public class ChooseProfileGuiController {
 		try {
 			showDataStoreContentRoot = FXMLLoader.load(getClass().getResource(SceneConstants.SHOW_DATASTORE_CONTENT));
 		} catch (IOException e) {
-			logger.error("This scene could not be loaded! " + SceneConstants.SHOW_DATASTORE_CONTENT, e.getMessage());
+			logger.error("This scene could not be loaded! " + SceneConstants.SHOW_DATASTORE_CONTENT, e);
 			JavaFXHelper.quit();
 		}
 
@@ -357,7 +357,7 @@ public class ChooseProfileGuiController {
 			aboutStage = new Stage();
 			aboutRoot = FXMLLoader.load(getClass().getResource(SceneConstants.ABOUT_DIALOGUE));
 		} catch (IOException e) {
-			logger.error("This scene could not be loaded! " + SceneConstants.ABOUT_DIALOGUE, e.getMessage());
+			logger.error("This scene could not be loaded! " + SceneConstants.ABOUT_DIALOGUE, e);
 			JavaFXHelper.quit();
 		}
 		Scene aboutScene = new Scene(aboutRoot, 800, 400);
