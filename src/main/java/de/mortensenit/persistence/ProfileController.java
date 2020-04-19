@@ -116,4 +116,30 @@ public class ProfileController {
 		}
 	}
 
+	/**
+	 * Delete the chosen profile from the datastore.
+	 * 
+	 * @param selectedProfile
+	 */
+	public void delete(DataStorageProfile selectedProfile) {
+		if (PersistenceController.getInstance().root() == null) {
+			logger.error("Error while trying to retrieve dataRoot");
+			JavaFXHelper.quit();
+		}
+
+		List<DataStorageProfile> profiles = PersistenceController.getInstance().root().getProfiles();
+
+		DataStorageProfile current = profiles.stream()
+				.filter(e -> e.getProfileName().equals(selectedProfile.getProfileName())).findFirst().orElse(null);
+		if (current != null) {
+			logger.info("Deleting profile " + selectedProfile.getProfileName());
+			profiles.remove(current);
+			persistenceController.root().setProfiles(profiles);
+			persistenceController.getStorageManager().store(profiles);
+			persistenceController.getStorageManager().storeRoot();
+		} else {
+			logger.error("Could not find a matching entry to delete.");
+		}
+	}
+
 }

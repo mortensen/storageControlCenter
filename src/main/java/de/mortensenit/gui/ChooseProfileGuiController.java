@@ -267,7 +267,7 @@ public class ChooseProfileGuiController {
 			logger.error("This scene could not be loaded! " + SceneConstants.SHOW_DATASTORE_CONTENT, e);
 			JavaFXHelper.quit();
 		}
-		
+
 		// find the list view to be able to get the selected item
 		Scene scene = JavaFXHelper.getSceneFromEvent(event);
 		DataStorageProfile selectedProfile = fetchSelectedProfile(scene);
@@ -277,7 +277,7 @@ public class ChooseProfileGuiController {
 		showDataStoreContentStage.setScene(showDataStoreContentScene);
 		showDataStoreContentStage.setTitle("Storage Control Center - " + selectedProfile.getProfileName());
 
-		//build tree
+		// build tree
 		ScrollPane treeScrollPane = (ScrollPane) showDataStoreContentRoot.lookup("#treeScrollPane");
 		TreeView<String> treeView = generateTreeView();
 		treeScrollPane.setContent(treeView);
@@ -320,7 +320,15 @@ public class ChooseProfileGuiController {
 	 */
 	@FXML
 	public void handleDeleteButton(ActionEvent event) {
-		// TODO: add delete functionality
+		// find the list view to be able to get the selected item
+		Scene scene = JavaFXHelper.getSceneFromEvent(event);
+		DataStorageProfile selectedProfile = fetchSelectedProfile(scene);
+		if (selectedProfile == null || selectedProfile.getProfileName() == null) {
+			logger.info("Nothing to delete");
+			return;
+		}
+		profileController.delete(selectedProfile);
+		loadProfileList(scene.getRoot());
 	}
 
 	/**
