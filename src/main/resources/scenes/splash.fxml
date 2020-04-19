@@ -10,7 +10,7 @@
    <children>
       <ImageView fitHeight="400.0" fitWidth="800.0" pickOnBounds="true" preserveRatio="true" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <image>
-            <Image url="@/images/logo.png" />
+            <Image url="@../images/logo.png" />
          </image></ImageView>
       <Label alignment="CENTER" prefHeight="24.0" prefWidth="800.0" style="-fx-background-color: lightgrey;" text="(C) 2020 - Frederik Mortensen" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
          <font>

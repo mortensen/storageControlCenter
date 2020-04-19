@@ -19,6 +19,9 @@ module scc {
 	// microstream
 	requires one.microstream.all;
 
+	//needed exports
 	exports de.mortensenit to javafx.graphics;
+	exports de.mortensenit.gui to javafx.fxml;
+	opens de.mortensenit.gui to javafx.fxml;
 
 }
