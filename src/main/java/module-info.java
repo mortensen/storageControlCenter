@@ -10,9 +10,9 @@ module scc {
 	opens de.mortensenit.gui to javafx.fxml;
 
 	// javafx
-	requires javafx.base;
-	requires javafx.controls;
-	requires javafx.fxml;
+	requires transitive javafx.base;
+	requires transitive javafx.controls;
+	requires transitive javafx.fxml;
 	requires transitive javafx.graphics;
 
 	// log4j
