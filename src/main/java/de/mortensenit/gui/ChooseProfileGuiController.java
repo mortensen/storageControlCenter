@@ -1,12 +1,15 @@
 package de.mortensenit.gui;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.mortensenit.model.DataStorageProfile;
+import de.mortensenit.persistence.PersistenceController;
 import de.mortensenit.persistence.ProfileController;
+import de.mortensenit.utils.JarUtils;
 import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -279,7 +282,7 @@ public class ChooseProfileGuiController {
 
 		// build tree
 		ScrollPane treeScrollPane = (ScrollPane) showDataStoreContentRoot.lookup("#treeScrollPane");
-		TreeView<String> treeView = generateTreeView();
+		TreeView<String> treeView = generateTreeView(selectedProfile);
 		treeScrollPane.setContent(treeView);
 
 		showDataStoreContentStage.setOnCloseRequest(e -> {
@@ -292,22 +295,39 @@ public class ChooseProfileGuiController {
 
 	/**
 	 * 
+	 * @param selectedProfile
 	 * @return
 	 */
-	private TreeView<String> generateTreeView() {
+	private TreeView<String> generateTreeView(DataStorageProfile selectedProfile) {
 		logger.debug("Loading tree...");
-		// TODO: Fake Daten
-		TreeItem<String> rootItem = new TreeItem<String>("DataStore", null);
+		PersistenceController persistenceController = PersistenceController.getInstance();
+		List<DataStorageProfile> profiles = persistenceController.root().getProfiles();
+		
+		for (DataStorageProfile profile : profiles) {
+			if (profile.getProfileName().equals(selectedProfile.getProfileName())) {
+				selectedProfile = profile;
+				break;
+			}
+		}
+		
+		logger.info("Loading dataStore for path " + selectedProfile.getJarPath());
+
+		List<Class<?>> entryClasses = null;
+
+		try {
+			entryClasses = JarUtils.getEntryClasses(selectedProfile.getJarPath());
+		} catch (Exception e) {
+			//TODO: JarUtils verbessern, besseres Exception handling
+			logger.error("Bla", e);
+		}
+		
+		TreeItem<String> rootItem = new TreeItem<String>(selectedProfile.getDataRootClassName(), null);
 		rootItem.setExpanded(true);
-
-		TreeItem<String> item = new TreeItem<String>("Users");
-		rootItem.getChildren().add(item);
-
-		TreeItem<String> item2 = new TreeItem<String>("Contacts");
-		rootItem.getChildren().add(item2);
-
-		TreeItem<String> item3 = new TreeItem<String>("Addresses");
-		rootItem.getChildren().add(item3);
+		
+		for (Class<?> clazz : entryClasses) {
+			TreeItem<String> item = new TreeItem<String>(clazz.getSimpleName());
+			rootItem.getChildren().add(item);
+		}
 
 		TreeView<String> treeView = new TreeView<String>();
 		treeView.setRoot(rootItem);
