@@ -1,7 +1,9 @@
 package de.mortensenit.gui;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -282,7 +284,11 @@ public class ChooseProfileGuiController {
 
 		// build tree
 		ScrollPane treeScrollPane = (ScrollPane) showDataStoreContentRoot.lookup("#treeScrollPane");
-		TreeView<String> treeView = generateTreeView(selectedProfile);
+		TreeView<String> treeView = generateDataStoreTreeView(selectedProfile);
+		if (treeView == null) {
+			logger.error("Can not show an empty tree view!");
+			return;
+		}
 		treeScrollPane.setContent(treeView);
 
 		showDataStoreContentStage.setOnCloseRequest(e -> {
@@ -294,44 +300,118 @@ public class ChooseProfileGuiController {
 	}
 
 	/**
+	 * load the jar file from the given path, search for the datastore root class
+	 * inside it and then build the tree view for this dataRoot. This is where the
+	 * magic happens!
 	 * 
 	 * @param selectedProfile
 	 * @return
 	 */
-	private TreeView<String> generateTreeView(DataStorageProfile selectedProfile) {
-		logger.debug("Loading tree...");
+	private TreeView<String> generateDataStoreTreeView(DataStorageProfile selectedProfile) {
+		logger.debug("Loading tree content...");
+
+		// First get persistent version of selected profile to have all data needed
+		String profileName = selectedProfile.getProfileName();
 		PersistenceController persistenceController = PersistenceController.getInstance();
 		List<DataStorageProfile> profiles = persistenceController.root().getProfiles();
-		
+
 		for (DataStorageProfile profile : profiles) {
-			if (profile.getProfileName().equals(selectedProfile.getProfileName())) {
+			if (profile.getProfileName().equals(profileName)) {
 				selectedProfile = profile;
 				break;
 			}
 		}
-		
-		logger.info("Loading dataStore for path " + selectedProfile.getJarPath());
 
-		List<Class<?>> entryClasses = null;
+		String jarPath = selectedProfile.getJarPath();
+		String dataRootClassName = selectedProfile.getDataRootClassName();
+		logger.info("Loading dataRoot with name " + dataRootClassName + " from " + jarPath);
 
-		try {
-			entryClasses = JarUtils.getEntryClasses(selectedProfile.getJarPath());
-		} catch (Exception e) {
-			//TODO: JarUtils verbessern, besseres Exception handling
-			logger.error("Bla", e);
-		}
-		
-		TreeItem<String> rootItem = new TreeItem<String>(selectedProfile.getDataRootClassName(), null);
-		rootItem.setExpanded(true);
-		
-		for (Class<?> clazz : entryClasses) {
-			TreeItem<String> item = new TreeItem<String>(clazz.getSimpleName());
-			rootItem.getChildren().add(item);
-		}
-
+		// Next create a JavaFX tree root item
 		TreeView<String> treeView = new TreeView<String>();
+		TreeItem<String> rootItem = new TreeItem<String>(dataRootClassName, null);
+		rootItem.setExpanded(true);
+
+		// Now fill tree with items
+		appendDataRootChildren(rootItem, jarPath, dataRootClassName);
+		// appendAllJarItems(rootItem, jarPath);
+
 		treeView.setRoot(rootItem);
 		return treeView;
+	}
+
+	/**
+	 * Now that we have a root element for our tree and the name of the jar file we
+	 * can load and build our tree. In this case only the classes of the dataRoot
+	 * will be added.
+	 * 
+	 * @param rootItem          the topmost element that was configured in the
+	 *                          profile
+	 * @param jarPath           the url to the file with classes that represent the
+	 *                          app whose datastore content we will show
+	 * @param dataRootClassName the fully qualified name of the class that should
+	 *                          hold the application datastore model
+	 */
+	private void appendDataRootChildren(TreeItem<String> rootItem, String jarPath, String dataRootClassName) {
+		// first load the full class tree of the jar
+		// TODO: Performance Optimierung - nicht den ganzen Baum laden?
+		TreeMap<String, List<Class<?>>> packageAndClassTree = JarUtils.loadFullClassTree(jarPath);
+		if (packageAndClassTree == null) {
+			logger.error("Could not load class tree! Check your jar path: " + jarPath);
+			return;
+		}
+
+		// next loop over all packages
+		Iterator<String> packagesIterator = packageAndClassTree.navigableKeySet().iterator();
+		while (packagesIterator.hasNext()) {
+			String treeEntry = packagesIterator.next();
+			if (treeEntry.endsWith(dataRootClassName)) {
+				List<Class<?>> classes = packageAndClassTree.get(treeEntry);
+				if (classes == null) {
+					return;
+				}
+				for (Class<?> clazz : classes) {
+					TreeItem<String> classItem = new TreeItem<String>();
+					classItem.setValue(clazz.getName());
+					rootItem.getChildren().add(classItem);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Now that we have a root element for our tree and the name of the jar file we
+	 * can load and build our tree. In this case the whole jar content will be
+	 * loaded, but only class files.
+	 * 
+	 * @param rootItem the topmost element that was configured in the profile
+	 * @param jarPath  the url to the file with classes that represent the app whose
+	 *                 datastore content we will show
+	 */
+	private void appendAllJarItems(TreeItem<String> rootItem, String jarPath) {
+		// first load the full class tree of the jar
+		TreeMap<String, List<Class<?>>> packageAndClassTree = JarUtils.loadFullClassTree(jarPath);
+		if (packageAndClassTree == null) {
+			logger.error("Could not load class tree! Check your jar path: " + jarPath);
+			return;
+		}
+
+		// next loop over all packages
+		Iterator<String> packagesIterator = packageAndClassTree.navigableKeySet().iterator();
+		while (packagesIterator.hasNext()) {
+
+			// add the package itself to the tree
+			String packageName = packagesIterator.next();
+			TreeItem<String> packageItem = new TreeItem<String>();
+			packageItem.setValue(packageName);
+			rootItem.getChildren().add(packageItem);
+
+			// add the classes to the package
+			List<Class<?>> clazzes = packageAndClassTree.get(packageName);
+			for (Class<?> clazz : clazzes) {
+				TreeItem<String> item = new TreeItem<String>(clazz.getSimpleName());
+				packageItem.getChildren().add(item);
+			}
+		}
 	}
 
 	/**
