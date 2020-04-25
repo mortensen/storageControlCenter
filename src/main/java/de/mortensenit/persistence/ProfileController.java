@@ -3,8 +3,8 @@ package de.mortensenit.persistence;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.mortensenit.gui.JavaFXHelper;
 import de.mortensenit.model.DataStorageProfile;
@@ -17,7 +17,7 @@ import de.mortensenit.model.DataStorageProfile;
  */
 public class ProfileController {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private Logger logger = LogManager.getLogger(getClass());
 
 	private PersistenceController persistenceController;
 

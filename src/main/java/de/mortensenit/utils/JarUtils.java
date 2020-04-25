@@ -11,8 +11,8 @@ import java.util.TreeMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Simple util class for everything java archive dependent. Searches for the
@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class JarUtils {
 
-	private static Logger logger = LoggerFactory.getLogger(JarUtils.class.getName());
+	private static Logger logger = LogManager.getLogger(JarUtils.class);
 
 	/**
 	 * Calls the method getRootPackageClasses to get all elements on the root level

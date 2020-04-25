@@ -6,8 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Simple util class for fileystem IO stuff.
@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FileSystemUtils {
 
-	private static Logger logger = LoggerFactory.getLogger(FileSystemUtils.class.getName());
+	private static Logger logger = LogManager.getLogger(FileSystemUtils.class);
 
 	/**
 	 * Deletes a directory

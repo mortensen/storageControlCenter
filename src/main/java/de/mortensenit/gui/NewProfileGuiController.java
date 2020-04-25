@@ -1,7 +1,7 @@
 package de.mortensenit.gui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.mortensenit.model.DataStorageProfile;
 import de.mortensenit.persistence.ProfileController;
@@ -19,7 +19,7 @@ import javafx.stage.Stage;
  */
 public class NewProfileGuiController {
 
-	private Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private Logger logger = LogManager.getLogger(getClass());
 
 	@FXML
 	private TextField profileName;

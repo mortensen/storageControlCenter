@@ -16,7 +16,7 @@ module scc {
 	requires transitive javafx.graphics;
 
 	// log4j
-	requires org.slf4j;
+	requires org.apache.logging.log4j;
 
 	// microstream
 	requires one.microstream.all;

@@ -5,13 +5,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.mortensenit.model.DataStorageProfile;
 import de.mortensenit.persistence.PersistenceController;
 import de.mortensenit.persistence.ProfileController;
 import de.mortensenit.utils.JarUtils;
+import de.mortensenit.utils.ReflectionsController;
 import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -50,7 +51,7 @@ import javafx.util.Duration;
  */
 public class ChooseProfileGuiController {
 
-	private Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private Logger logger = LogManager.getLogger(getClass());
 
 	@FXML
 	private Button newButton;
@@ -365,6 +366,9 @@ public class ChooseProfileGuiController {
 		while (packagesIterator.hasNext()) {
 			String treeEntry = packagesIterator.next();
 			if (treeEntry.endsWith(dataRootClassName)) {
+				String packageName = ReflectionsController.extractPackage(treeEntry);
+				logger.debug(packageName);
+
 				List<Class<?>> classes = packageAndClassTree.get(treeEntry);
 				if (classes == null) {
 					return;

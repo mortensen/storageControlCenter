@@ -1,7 +1,7 @@
 package de.mortensenit.gui;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import de.mortensenit.model.DataStorageProfile;
 import javafx.event.ActionEvent;
@@ -18,7 +18,7 @@ import javafx.scene.control.MenuItem;
  */
 public class DataStoreContentGuiController {
 
-	private Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private Logger logger = LogManager.getLogger(getClass());
 
 	@FXML
 	private Button backButton;
