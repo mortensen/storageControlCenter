@@ -2,8 +2,8 @@ package de.mortensenit.persistence;
 
 import java.time.Duration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import one.microstream.reference.LazyReferenceManager;
 import one.microstream.storage.configuration.Configuration;
@@ -17,7 +17,7 @@ import one.microstream.storage.types.EmbeddedStorageManager;
  */
 public class PersistenceController {
 
-	private Logger logger = LoggerFactory.getLogger(getClass().getName());
+	private Logger logger = LogManager.getLogger(getClass());
 
 	/**
 	 * the microStream datastorage access manager

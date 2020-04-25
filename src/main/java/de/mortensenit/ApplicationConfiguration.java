@@ -7,8 +7,8 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.Properties;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * TODO: needs quality check<br />
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ApplicationConfiguration {
 
-	private Logger logger = LoggerFactory.getLogger(getClass());
+	private Logger logger = LogManager.getLogger(getClass());
 
 	// filesystem settings for the application
 	private Properties applicationProperties;
