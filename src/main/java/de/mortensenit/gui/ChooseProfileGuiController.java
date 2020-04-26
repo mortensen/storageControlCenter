@@ -14,10 +14,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.mortensenit.model.DataStorageProfile;
-import de.mortensenit.persistence.PersistenceController;
+import de.mortensenit.persistence.MicroStreamController;
 import de.mortensenit.persistence.ProfileController;
 import de.mortensenit.utils.JarUtils;
-import de.mortensenit.utils.StringUtils;
 import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -291,7 +290,7 @@ public class ChooseProfileGuiController {
 		// build tree by loading the jar content, finding the datastore and get the
 		// child elements
 		ScrollPane treeScrollPane = (ScrollPane) showDataStoreContentRoot.lookup("#treeScrollPane");
-		TreeView<String> treeView = generateDataStoreTreeView(selectedProfile);
+		TreeView<String> treeView = generateDataStoreTreeView(selectedProfile, dataStoreContentGuiController);
 		if (treeView == null) {
 			logger.error("Can not show an empty tree view!");
 			return;
@@ -314,32 +313,33 @@ public class ChooseProfileGuiController {
 	 * @param selectedProfile
 	 * @return
 	 */
-	private TreeView<String> generateDataStoreTreeView(DataStorageProfile selectedProfile) {
-		logger.debug("Loading tree content...");
-
-		// First get persistent version of selected profile to have all data needed
-		String profileName = selectedProfile.getProfileName();
-		PersistenceController persistenceController = PersistenceController.getInstance();
-		List<DataStorageProfile> profiles = persistenceController.root().getProfiles();
-
-		for (DataStorageProfile profile : profiles) {
-			if (profile.getProfileName().equals(profileName)) {
-				selectedProfile = profile;
-				break;
-			}
-		}
-
+	private TreeView<String> generateDataStoreTreeView(DataStorageProfile selectedProfile,
+			DataStoreContentGuiController dataStoreContentGuiController) {
+		
+		//load persistent profile
+		selectedProfile = profileController.loadPersistentProfile(selectedProfile);
 		String jarPath = selectedProfile.getJarPath();
 		String dataRootClassName = selectedProfile.getDataRootClassName();
-		logger.info("Loading dataRoot with name " + dataRootClassName + " from " + jarPath);
 
-		// Next create a JavaFX tree root item
+		// load dataRoot class from external jar using a URLClassLoader
+		Class<?> dataRootClass = JarUtils.findDataRootClass(jarPath, dataRootClassName);
+		if (dataRootClass == null) {
+			logger.error("Could not parse dataRoot class named " + dataRootClassName);
+			return null;
+		}
+
+		//instantiate microStream controller and connect to configured external application database
+		MicroStreamController<?> microStreamController = MicroStreamController
+				.generateMicroStreamController(selectedProfile.getDataStorePath(), dataRootClass);
+		dataStoreContentGuiController.setMicroStreamController(microStreamController);
+		
+		// create a JavaFX tree root item
 		TreeView<String> treeView = new TreeView<String>();
 		TreeItem<String> rootItem = new TreeItem<String>(dataRootClassName, null);
 		rootItem.setExpanded(true);
 
 		// Now fill tree with items
-		appendDataRootChildren(rootItem, jarPath, dataRootClassName);
+		appendDataRootChildren(rootItem, jarPath, dataRootClass);
 		// appendAllJarItems(rootItem, jarPath);
 
 		treeView.setRoot(rootItem);
@@ -351,71 +351,16 @@ public class ChooseProfileGuiController {
 	 * can load and build our tree. In this case only the classes of the dataRoot
 	 * will be added.
 	 * 
-	 * @param rootItem          the topmost element that was configured in the
-	 *                          profile
-	 * @param jarPath           the url to the file with classes that represent the
-	 *                          app whose datastore content we will show
-	 * @param dataRootClassName the fully qualified name of the class that should
-	 *                          hold the application datastore model
+	 * @param rootItem     the topmost element that was configured in the profile
+	 * @param jarPath      the url to the file with classes that represent the app
+	 *                     whose datastore content we will show
+	 * @param dataRootClas the application datastore model root
 	 */
-	private void appendDataRootChildren(TreeItem<String> rootItem, String jarPath, String dataRootClassName) {
-		Class<?> dataRootClass = findDataRootClass(jarPath, dataRootClassName);
+	private void appendDataRootChildren(TreeItem<String> rootItem, String jarPath, Class<?> dataRootClass) {
 		URLClassLoader urlClassLoader = JarUtils.buildURLClassLoader(jarPath);
-
-		if (dataRootClass != null) {
-			// subtrees aufbauen...
-			List<TreeItem<String>> children = getTreeChildren(dataRootClass, urlClassLoader);
-			rootItem.getChildren().addAll(children);
-		} else {
-			logger.error("Could not parse dataRoot class named " + dataRootClassName);
-		}
-
-	}
-
-	/**
-	 * 
-	 * @param jarPath           the url to the file with classes that represent the
-	 *                          app whose datastore content we will show
-	 * @param dataRootClassName the fully qualified name of the class that should
-	 *                          hold the application datastore model
-	 * @return the class reference to the configured datastore root class
-	 */
-	private Class<?> findDataRootClass(String jarPath, String dataRootClassName) {
-
-		// first load the full class tree of the jar
-		// TODO: Performance Optimierung - nicht den ganzen Baum laden?
-		TreeMap<String, List<Class<?>>> packageAndClassTree = JarUtils.loadFullClassTree(jarPath);
-		if (packageAndClassTree == null) {
-			logger.error("Could not load class tree! Check your jar path: " + jarPath);
-			return null;
-		}
-
-		// get package name and class name
-		String[] packageAndClass = StringUtils.splitPackageAndClass(dataRootClassName);
-		if (packageAndClass == null) {
-			logger.error("Could not split dataRootClassName into package and class: " + dataRootClassName);
-			return null;
-		}
-
-		String packageName = packageAndClass[0];
-
-		// now get the list of classes inside the package of the dataRootClassName
-		List<Class<?>> classes = packageAndClassTree.get(packageName);
-
-		if (classes == null) {
-			logger.error("Could not find any classes inside package " + packageName);
-			return null;
-		}
-
-		// filter dataRootClass
-		for (Class<?> clazz : classes) {
-			if (clazz.getName().equals(dataRootClassName)) {
-				return clazz;
-			}
-		}
-
-		logger.warn("Could not find dataRootClass " + dataRootClassName + " inside package " + jarPath);
-		return null;
+		// subtrees aufbauen...
+		List<TreeItem<String>> children = getTreeChildren(dataRootClass, urlClassLoader);
+		rootItem.getChildren().addAll(children);
 	}
 
 	/**
@@ -459,18 +404,19 @@ public class ChooseProfileGuiController {
 
 		Field[] childFields = null;
 		if (parent.getType().isInstance(new ArrayList<>())) {
-			//in case of lists we need to get the parameterized type (e.g. List<Person>)
+			// in case of lists we need to get the parameterized type (e.g. List<Person>)
 			ParameterizedType listType = (ParameterizedType) parent.getGenericType();
 			Type type = listType.getActualTypeArguments()[0];
 			try {
 				Class<?> clazz = urlClassLoader.loadClass(type.getTypeName());
 				childFields = clazz.getDeclaredFields();
 			} catch (ClassNotFoundException e) {
-				logger.error("Could not parse parameterized type and instantiate it! Type was: " + type.getTypeName(), e);
+				logger.error("Could not parse parameterized type and instantiate it! Type was: " + type.getTypeName(),
+						e);
 				return null;
 			}
 		} else {
-			//simple objects
+			// simple objects
 			childFields = parent.getType().getDeclaredFields();
 		}
 		// if there are no children, then there is nothing to do

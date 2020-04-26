@@ -142,4 +142,25 @@ public class ProfileController {
 		}
 	}
 
+	/**
+	 * load the persistent profile by its name
+	 * 
+	 * @param selectedProfile
+	 * @return
+	 */
+	public DataStorageProfile loadPersistentProfile(DataStorageProfile selectedProfile) {
+		String profileName = selectedProfile.getProfileName();
+		logger.info("Loading persistent profile " + profileName);
+		PersistenceController persistenceController = PersistenceController.getInstance();
+		List<DataStorageProfile> profiles = persistenceController.root().getProfiles();
+
+		for (DataStorageProfile profile : profiles) {
+			if (profile.getProfileName().equals(profileName)) {
+				selectedProfile = profile;
+				break;
+			}
+		}
+		return selectedProfile;
+	}
+
 }

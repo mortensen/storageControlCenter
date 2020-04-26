@@ -26,6 +26,54 @@ public class JarUtils {
 	private static Logger logger = LogManager.getLogger(JarUtils.class);
 
 	/**
+	 * 
+	 * @param jarPath           the url to the file with classes that represent the
+	 *                          app whose datastore content we will show
+	 * @param dataRootClassName the fully qualified name of the class that should
+	 *                          hold the application datastore model
+	 * @return the class reference to the configured datastore root class
+	 */
+	public static Class<?> findDataRootClass(String jarPath, String dataRootClassName) {
+
+		logger.info("Searching class for dataRoot name in external jar.");
+
+		// TODO: Performance Optimierung - nicht den ganzen Baum laden?
+		// first load the full class tree of the jar
+		TreeMap<String, List<Class<?>>> packageAndClassTree = loadFullClassTree(jarPath);
+		if (packageAndClassTree == null) {
+			logger.error("Could not load class tree! Check your jar path: " + jarPath);
+			return null;
+		}
+
+		// get package name and class name
+		String[] packageAndClass = StringUtils.splitPackageAndClass(dataRootClassName);
+		if (packageAndClass == null) {
+			logger.error("Could not split dataRootClassName into package and class: " + dataRootClassName);
+			return null;
+		}
+
+		String packageName = packageAndClass[0];
+
+		// now get the list of classes inside the package of the dataRootClassName
+		List<Class<?>> classes = packageAndClassTree.get(packageName);
+
+		if (classes == null) {
+			logger.error("Could not find any classes inside package " + packageName);
+			return null;
+		}
+
+		// filter dataRootClass
+		for (Class<?> clazz : classes) {
+			if (clazz.getName().equals(dataRootClassName)) {
+				return clazz;
+			}
+		}
+
+		logger.warn("Could not find dataRootClass " + dataRootClassName + " inside package " + jarPath);
+		return null;
+	}
+
+	/**
 	 * Calls the method getRootPackageClasses to get all elements on the root level
 	 * of the given jar. Then filters by name.
 	 * 
