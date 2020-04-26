@@ -83,6 +83,20 @@ public class JarUtils {
 
 		logger.info("Searching for jar: " + jarPath);
 
+		URLClassLoader urlClassLoader = buildURLClassLoader(jarPath);
+		TreeMap<String, List<Class<?>>> classTree = buildClassTree(jarPath, urlClassLoader);
+		return classTree;
+
+	}
+
+	/**
+	 * Generate a urlClassloader instance that will be able to instantiate classes
+	 * from inside the jar file
+	 * 
+	 * @param jarPath the file system path to the application jar file
+	 * @return urlClassLoader instance
+	 */
+	public static URLClassLoader buildURLClassLoader(String jarPath) {
 		// load jar with classloader
 		URL[] urls = new URL[1];
 		URL url = null;
@@ -93,13 +107,9 @@ public class JarUtils {
 			return null;
 		}
 		urls[0] = url;
-		try (URLClassLoader urlClassloader = new URLClassLoader(urls)) {
-			TreeMap<String, List<Class<?>>> classTree = buildClassTree(jarPath, urlClassloader);
-			return classTree;
-		} catch (IOException e) {
-			logger.error("An error occured while trying to load the url class loader for url " + jarPath, e);
-			return null;
-		}
+		URLClassLoader urlClassloader = new URLClassLoader(urls);
+		return urlClassloader;
+
 	}
 
 	/**
