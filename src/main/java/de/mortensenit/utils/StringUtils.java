@@ -28,4 +28,22 @@ public class StringUtils {
 		return false;
 	}
 
+	/**
+	 * 
+	 * @param fullClassName
+	 * @return
+	 */
+	public static String[] splitPackageAndClass(String fullClassName) {
+		if (StringUtils.isNullOrEmpty(fullClassName)) {
+			return null;
+		}
+		
+		String packageName = fullClassName.substring(0, fullClassName.lastIndexOf("."));
+		String className = fullClassName.replace(packageName + ".", "");
+		String[] packageAndClass = new String[2];
+		packageAndClass[0] = packageName;
+		packageAndClass[1] = className;
+		return packageAndClass;
+	}
+
 }
