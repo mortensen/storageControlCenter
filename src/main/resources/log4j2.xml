@@ -6,7 +6,7 @@
 		</Console>
 	</Appenders>
 	<RollingFile name="File"
-		fileName="${basePath}/scc-info.log"
+		fileName="/var/log/scc-info.log"
 		filePattern="${basePath}/app-info-%d{yyyy-MM-dd}.log">
 		<PatternLayout>
 			<pattern>[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n
