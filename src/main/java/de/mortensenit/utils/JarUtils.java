@@ -90,7 +90,7 @@ public class JarUtils {
 	}
 
 	/**
-	 * Generate a urlClassloader instance that will be able to instanciate classes
+	 * Generate a urlClassloader instance that will be able to instantiate classes
 	 * from inside the jar file
 	 * 
 	 * @param jarPath the file system path to the application jar file

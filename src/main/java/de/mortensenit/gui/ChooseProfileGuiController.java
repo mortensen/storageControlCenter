@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -359,10 +360,11 @@ public class ChooseProfileGuiController {
 	 */
 	private void appendDataRootChildren(TreeItem<String> rootItem, String jarPath, String dataRootClassName) {
 		Class<?> dataRootClass = findDataRootClass(jarPath, dataRootClassName);
+		URLClassLoader urlClassLoader = JarUtils.buildURLClassLoader(jarPath);
 
 		if (dataRootClass != null) {
 			// subtrees aufbauen...
-			List<TreeItem<String>> children = getTreeChildren(dataRootClass);
+			List<TreeItem<String>> children = getTreeChildren(dataRootClass, urlClassLoader);
 			rootItem.getChildren().addAll(children);
 		} else {
 			logger.error("Could not parse dataRoot class named " + dataRootClassName);
@@ -421,16 +423,17 @@ public class ChooseProfileGuiController {
 	 * over their recursive fields. Then the tree of all subentries will be
 	 * returned.
 	 * 
-	 * @param clazz the dataRoot parent class
+	 * @param clazz          the dataRoot parent class
+	 * @param urlClassLoader helps instantiating classes inside the application jar
 	 * @return the list of child entries and their recursive children e.G. Person ->
 	 *         Address -> Street
 	 */
-	private List<TreeItem<String>> getTreeChildren(Class<?> clazz) {
+	private List<TreeItem<String>> getTreeChildren(Class<?> clazz, URLClassLoader urlClassLoader) {
 		List<TreeItem<String>> firstLevelEntries = new ArrayList<TreeItem<String>>();
 
 		for (Field field : clazz.getDeclaredFields()) {
 			TreeItem<String> firstLevelEntry = new TreeItem<String>(field.getName(), null);
-			List<TreeItem<String>> children = getRecursiveFields(field, firstLevelEntry);
+			List<TreeItem<String>> children = getRecursiveFields(field, firstLevelEntry, urlClassLoader);
 			if (children != null) {
 				firstLevelEntry.getChildren().addAll(children);
 			}
@@ -442,23 +445,34 @@ public class ChooseProfileGuiController {
 	/**
 	 * recursive method to get all child tree elements to be able to build the tree
 	 * 
-	 * @param parent      the parent field whose children we will examine
-	 * @param parentEntry the parent tree node that will recieve the child entries
-	 * @return
+	 * @param parent         the parent field whose children we will examine
+	 * @param parentEntry    the parent tree node that will recieve the child
+	 *                       entries
+	 * @param urlClassLoader instantiate external classes
+	 * @return the list of child elements that the given field holds
 	 */
-	private List<TreeItem<String>> getRecursiveFields(Field parent, TreeItem<String> parentEntry) {
+	private List<TreeItem<String>> getRecursiveFields(Field parent, TreeItem<String> parentEntry,
+			URLClassLoader urlClassLoader) {
 		// when we reach class level, we stop recursion
 		if (parent.getName().equals("clazz") && parent.getType().equals(Class.class))
 			return null;
 
+		Field[] childFields = null;
 		if (parent.getType().isInstance(new ArrayList<>())) {
+			//in case of lists we need to get the parameterized type (e.g. List<Person>)
 			ParameterizedType listType = (ParameterizedType) parent.getGenericType();
 			Type type = listType.getActualTypeArguments()[0];
-			System.out.println();
+			try {
+				Class<?> clazz = urlClassLoader.loadClass(type.getTypeName());
+				childFields = clazz.getDeclaredFields();
+			} catch (ClassNotFoundException e) {
+				logger.error("Could not parse parameterized type and instantiate it! Type was: " + type.getTypeName(), e);
+				return null;
+			}
 		} else {
-
+			//simple objects
+			childFields = parent.getType().getDeclaredFields();
 		}
-		Field[] childFields = parent.getType().getDeclaredFields();
 		// if there are no children, then there is nothing to do
 		if (childFields.length == 0)
 			return null;
@@ -467,7 +481,7 @@ public class ChooseProfileGuiController {
 		for (Field childField : childFields) {
 			TreeItem<String> childTreeItem = new TreeItem<>(childField.getName());
 			childTreeItems.add(childTreeItem);
-			List<TreeItem<String>> grandChildren = getRecursiveFields(childField, childTreeItem);
+			List<TreeItem<String>> grandChildren = getRecursiveFields(childField, childTreeItem, urlClassLoader);
 			if (grandChildren == null) {
 				return childTreeItems;
 			} else {
