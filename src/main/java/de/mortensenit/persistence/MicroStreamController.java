@@ -35,6 +35,9 @@ public class MicroStreamController<T> {
 
 		// startup storage
 		storageManager.start();
+		
+		Object myRoot = storageManager.root();
+		System.out.println();
 
 		// Start lazy reference management with timeout after
 		// 10 minutes without any access. This will start a new thread.

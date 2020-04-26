@@ -71,7 +71,7 @@
                         <Insets left="10.0" right="10.0" top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <TextField fx:id="profileName" promptText="z.B. Development, Live...">
+                  <TextField fx:id="profileName" promptText="Development, Live...">
                      <VBox.margin>
                         <Insets left="10.0" right="10.0" />
                      </VBox.margin>
@@ -81,7 +81,7 @@
                         <Insets left="10.0" right="10.0" top="10.0" />
                      </VBox.margin>
                   </Label>
-                  <TextField fx:id="jarPath" promptText="/home/user/appdir/app.jar">
+                  <TextField fx:id="jarPath" promptText="/home/user1/appdir/app.jar">
                      <VBox.margin>
                         <Insets left="10.0" right="10.0" />
                      </VBox.margin>
@@ -92,6 +92,16 @@
                      </VBox.margin>
                   </Label>
                   <TextField fx:id="dataRootClassName" promptText="com.example.MyDataStore">
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" />
+                     </VBox.margin>
+                  </TextField>
+                  <Label text="DataStore Pfad der Anwendung (beinhaltet channel_0 Ordner)">
+                     <VBox.margin>
+                        <Insets left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Label>
+                  <TextField fx:id="dataStorePath" promptText="/home/user1/microstream">
                      <VBox.margin>
                         <Insets bottom="10.0" left="10.0" right="10.0" />
                      </VBox.margin>

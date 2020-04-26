@@ -32,6 +32,9 @@ public class EditProfileGuiController {
 
 	@FXML
 	private TextField dataRootClassName;
+	
+	@FXML
+	private TextField dataStorePath;
 
 	@FXML
 	private Button saveButton;
@@ -58,11 +61,14 @@ public class EditProfileGuiController {
 		logOutput.append(jarPath.getText());
 		logOutput.append(" and root class ");
 		logOutput.append(dataRootClassName.getText());
+		logOutput.append(" and dataStore path ");
+		logOutput.append(dataStorePath.getText());
 		logger.info(logOutput.toString());
 
 		profile.setProfileName(profileName.getText());
 		profile.setJarPath(jarPath.getText());
 		profile.setDataRootClassName(dataRootClassName.getText());
+		profile.setDataStorePath(dataStorePath.getText());
 		profileController.update(profile);
 
 		Stage currentStage = JavaFXHelper.getStageFromEvent(event);
@@ -111,6 +117,7 @@ public class EditProfileGuiController {
 			this.profileName.setText(persistentProfile.getProfileName());
 			this.jarPath.setText(persistentProfile.getJarPath());
 			this.dataRootClassName.setText(persistentProfile.getDataRootClassName());
+			this.dataStorePath.setText(persistentProfile.getDataStorePath());
 		} else {
 			logger.error("Could not find the persistent profile in the datastore!", profile.toString());
 		}
