@@ -1,6 +1,10 @@
 package de.mortensenit.gui;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
@@ -12,7 +16,7 @@ import de.mortensenit.model.DataStorageProfile;
 import de.mortensenit.persistence.PersistenceController;
 import de.mortensenit.persistence.ProfileController;
 import de.mortensenit.utils.JarUtils;
-import de.mortensenit.utils.ReflectionsController;
+import de.mortensenit.utils.StringUtils;
 import javafx.animation.PauseTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -283,7 +287,8 @@ public class ChooseProfileGuiController {
 		showDataStoreContentStage.setScene(showDataStoreContentScene);
 		showDataStoreContentStage.setTitle("Storage Control Center - " + selectedProfile.getProfileName());
 
-		// build tree
+		// build tree by loading the jar content, finding the datastore and get the
+		// child elements
 		ScrollPane treeScrollPane = (ScrollPane) showDataStoreContentRoot.lookup("#treeScrollPane");
 		TreeView<String> treeView = generateDataStoreTreeView(selectedProfile);
 		if (treeView == null) {
@@ -353,33 +358,123 @@ public class ChooseProfileGuiController {
 	 *                          hold the application datastore model
 	 */
 	private void appendDataRootChildren(TreeItem<String> rootItem, String jarPath, String dataRootClassName) {
+		Class<?> dataRootClass = findDataRootClass(jarPath, dataRootClassName);
+
+		if (dataRootClass != null) {
+			// subtrees aufbauen...
+			List<TreeItem<String>> children = getTreeChildren(dataRootClass);
+			rootItem.getChildren().addAll(children);
+		} else {
+			logger.error("Could not parse dataRoot class named " + dataRootClassName);
+		}
+
+	}
+
+	/**
+	 * 
+	 * @param jarPath           the url to the file with classes that represent the
+	 *                          app whose datastore content we will show
+	 * @param dataRootClassName the fully qualified name of the class that should
+	 *                          hold the application datastore model
+	 * @return the class reference to the configured datastore root class
+	 */
+	private Class<?> findDataRootClass(String jarPath, String dataRootClassName) {
+
 		// first load the full class tree of the jar
 		// TODO: Performance Optimierung - nicht den ganzen Baum laden?
 		TreeMap<String, List<Class<?>>> packageAndClassTree = JarUtils.loadFullClassTree(jarPath);
 		if (packageAndClassTree == null) {
 			logger.error("Could not load class tree! Check your jar path: " + jarPath);
-			return;
+			return null;
 		}
 
-		// next loop over all packages
-		Iterator<String> packagesIterator = packageAndClassTree.navigableKeySet().iterator();
-		while (packagesIterator.hasNext()) {
-			String treeEntry = packagesIterator.next();
-			if (treeEntry.endsWith(dataRootClassName)) {
-				String packageName = ReflectionsController.extractPackage(treeEntry);
-				logger.debug(packageName);
+		// get package name and class name
+		String[] packageAndClass = StringUtils.splitPackageAndClass(dataRootClassName);
+		if (packageAndClass == null) {
+			logger.error("Could not split dataRootClassName into package and class: " + dataRootClassName);
+			return null;
+		}
 
-				List<Class<?>> classes = packageAndClassTree.get(treeEntry);
-				if (classes == null) {
-					return;
-				}
-				for (Class<?> clazz : classes) {
-					TreeItem<String> classItem = new TreeItem<String>();
-					classItem.setValue(clazz.getName());
-					rootItem.getChildren().add(classItem);
-				}
+		String packageName = packageAndClass[0];
+
+		// now get the list of classes inside the package of the dataRootClassName
+		List<Class<?>> classes = packageAndClassTree.get(packageName);
+
+		if (classes == null) {
+			logger.error("Could not find any classes inside package " + packageName);
+			return null;
+		}
+
+		// filter dataRootClass
+		for (Class<?> clazz : classes) {
+			if (clazz.getName().equals(dataRootClassName)) {
+				return clazz;
 			}
 		}
+
+		logger.warn("Could not find dataRootClass " + dataRootClassName + " inside package " + jarPath);
+		return null;
+	}
+
+	/**
+	 * Beginning with the dataRoot class we will search for all fields and then loop
+	 * over their recursive fields. Then the tree of all subentries will be
+	 * returned.
+	 * 
+	 * @param clazz the dataRoot parent class
+	 * @return the list of child entries and their recursive children e.G. Person ->
+	 *         Address -> Street
+	 */
+	private List<TreeItem<String>> getTreeChildren(Class<?> clazz) {
+		List<TreeItem<String>> firstLevelEntries = new ArrayList<TreeItem<String>>();
+
+		for (Field field : clazz.getDeclaredFields()) {
+			TreeItem<String> firstLevelEntry = new TreeItem<String>(field.getName(), null);
+			List<TreeItem<String>> children = getRecursiveFields(field, firstLevelEntry);
+			if (children != null) {
+				firstLevelEntry.getChildren().addAll(children);
+			}
+			firstLevelEntries.add(firstLevelEntry);
+		}
+		return firstLevelEntries;
+	}
+
+	/**
+	 * recursive method to get all child tree elements to be able to build the tree
+	 * 
+	 * @param parent      the parent field whose children we will examine
+	 * @param parentEntry the parent tree node that will recieve the child entries
+	 * @return
+	 */
+	private List<TreeItem<String>> getRecursiveFields(Field parent, TreeItem<String> parentEntry) {
+		// when we reach class level, we stop recursion
+		if (parent.getName().equals("clazz") && parent.getType().equals(Class.class))
+			return null;
+
+		if (parent.getType().isInstance(new ArrayList<>())) {
+			ParameterizedType listType = (ParameterizedType) parent.getGenericType();
+			Type type = listType.getActualTypeArguments()[0];
+			System.out.println();
+		} else {
+
+		}
+		Field[] childFields = parent.getType().getDeclaredFields();
+		// if there are no children, then there is nothing to do
+		if (childFields.length == 0)
+			return null;
+
+		List<TreeItem<String>> childTreeItems = new ArrayList<>();
+		for (Field childField : childFields) {
+			TreeItem<String> childTreeItem = new TreeItem<>(childField.getName());
+			childTreeItems.add(childTreeItem);
+			List<TreeItem<String>> grandChildren = getRecursiveFields(childField, childTreeItem);
+			if (grandChildren == null) {
+				return childTreeItems;
+			} else {
+				childTreeItem.getChildren().addAll(grandChildren);
+			}
+		}
+		return childTreeItems;
 	}
 
 	/**
