@@ -29,9 +29,9 @@ public class StringUtils {
 	}
 
 	/**
-	 * 
+	 * Separates the class name from the package name.
 	 * @param fullClassName
-	 * @return
+	 * @return an array containing the package name and class name
 	 */
 	public static String[] splitPackageAndClass(String fullClassName) {
 		if (StringUtils.isNullOrEmpty(fullClassName)) {

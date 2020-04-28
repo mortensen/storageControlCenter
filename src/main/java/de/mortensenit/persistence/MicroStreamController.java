@@ -20,9 +20,11 @@ public class MicroStreamController {
 	private Object dataRoot = null;
 
 	/**
+	 * Loads a connection to an external microstream datastore
 	 * 
-	 * @param datastorePath
-	 * @param jarPath
+	 * @param datastorePath this is where the channel files and TypeDescriptor are
+	 * @param jarPath       the path to the application jar with the classes that
+	 *                      are used with this external datastore
 	 */
 	public void connect(String datastorePath, String jarPath) {
 
@@ -34,11 +36,12 @@ public class MicroStreamController {
 		storageManager = Configuration.Default().setBaseDirectory(datastorePath).setChannelCount(1)
 				.createEmbeddedStorageFoundation().createEmbeddedStorageManager();
 
+		// TODO: current issue:
+		// one.microstream.persistence.exceptions.PersistenceException:
+		// Missing runtime type for required type handler for
+		// type: de.mortensenit.example.persistence.ExampleDataRoot
+
 		// startup storage
-		//TODO: current issue:
-		//one.microstream.persistence.exceptions.PersistenceException:
-		//Missing runtime type for required type handler for
-		//type: de.mortensenit.example.persistence.ExampleDataRoot
 		storageManager.start();
 
 		// Start lazy reference management with timeout after

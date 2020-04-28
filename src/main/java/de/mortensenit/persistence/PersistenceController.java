@@ -51,7 +51,6 @@ public class PersistenceController {
 	 */
 	public void initDatastore() {
 		logger.info("Initializing datastore...");
-		// TODO: maybe make configurable
 		initDatastore("microstream/scc");
 	}
 

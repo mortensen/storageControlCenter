@@ -87,7 +87,7 @@ public class ChooseProfileGuiController {
 	 */
 	public void transistToProfileChooserDialogue(Stage splashStage) {
 		// Wait n seconds, then switch from splash screen to chooseProfile view
-		PauseTransition pause = new PauseTransition(Duration.seconds(1));
+		PauseTransition pause = new PauseTransition(Duration.seconds(3));
 		pause.setOnFinished(event -> {
 			openProfileChooserDialogue(splashStage);
 		});
@@ -310,7 +310,10 @@ public class ChooseProfileGuiController {
 	 * inside it and then build the tree view for this dataRoot. This is where the
 	 * magic happens!
 	 * 
-	 * @param selectedProfile
+	 * @param selectedProfile               the profile which was clicked in the
+	 *                                      profile list view
+	 * @param dataStoreContentGuiController the target controller that handles the
+	 *                                      content of the datastores
 	 * @return
 	 */
 	private TreeView<String> generateDataStoreTreeView(DataStorageProfile selectedProfile,
@@ -331,7 +334,7 @@ public class ChooseProfileGuiController {
 		// instantiate microStream controller and connect to configured external
 		// application database
 		MicroStreamController microStreamController = new MicroStreamController();
-		//microStreamController.connect(selectedProfile.getDataStorePath(), jarPath);
+		// microStreamController.connect(selectedProfile.getDataStorePath(), jarPath);
 		dataStoreContentGuiController.setMicroStreamController(microStreamController);
 
 		// create a JavaFX tree root item
@@ -352,10 +355,10 @@ public class ChooseProfileGuiController {
 	 * can load and build our tree. In this case only the classes of the dataRoot
 	 * will be added.
 	 * 
-	 * @param rootItem     the topmost element that was configured in the profile
-	 * @param jarPath      the url to the file with classes that represent the app
-	 *                     whose datastore content we will show
-	 * @param dataRootClas the application datastore model root
+	 * @param rootItem      the topmost element that was configured in the profile
+	 * @param jarPath       the url to the file with classes that represent the app
+	 *                      whose datastore content we will show
+	 * @param dataRootClass the application datastore model root
 	 */
 	private void appendDataRootChildren(TreeItem<String> rootItem, String jarPath, Class<?> dataRootClass) {
 		URLClassLoader urlClassLoader = JarUtils.buildURLClassLoader(jarPath);
