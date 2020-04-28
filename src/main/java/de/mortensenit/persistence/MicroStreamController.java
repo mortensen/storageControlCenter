@@ -13,31 +13,33 @@ import one.microstream.storage.types.EmbeddedStorageManager;
  * @author frederik.mortensen
  *
  */
-public class MicroStreamController<T> {
+public class MicroStreamController {
 
 	private EmbeddedStorageManager storageManager = null;
 
-	private T dataRoot = null;
+	private Object dataRoot = null;
 
 	/**
 	 * 
 	 * @param datastorePath
+	 * @param jarPath
 	 */
-	private void connect(String datastorePath) {
+	public void connect(String datastorePath, String jarPath) {
 
 		if (datastorePath == null)
 			throw new IllegalArgumentException("Datastore path not set! Check your configuration!");
 
 		// Configure paths and root, then create a storage manager instance
 		// This will start 1 thread per channel.
-		storageManager = Configuration.Default().setBaseDirectoryInUserHome(datastorePath).setChannelCount(1)
+		storageManager = Configuration.Default().setBaseDirectory(datastorePath).setChannelCount(1)
 				.createEmbeddedStorageFoundation().createEmbeddedStorageManager();
 
 		// startup storage
+		//TODO: current issue:
+		//one.microstream.persistence.exceptions.PersistenceException:
+		//Missing runtime type for required type handler for
+		//type: de.mortensenit.example.persistence.ExampleDataRoot
 		storageManager.start();
-		
-		Object myRoot = storageManager.root();
-		System.out.println();
 
 		// Start lazy reference management with timeout after
 		// 10 minutes without any access. This will start a new thread.
@@ -45,34 +47,10 @@ public class MicroStreamController<T> {
 	}
 
 	/**
-	 * 
+	 * shutdown the storage manager
 	 */
 	public void disconnect() {
-		// TODO:...
-	}
-
-	/**
-	 * generate an instance of a microStream controller, connect to the configured
-	 * external app dataStore and get the dataRoot
-	 * 
-	 * @param <T>
-	 * @param dataRoot
-	 * @param dataStorePath
-	 * @return
-	 */
-	public static <T> MicroStreamController<T> generateMicroStreamController(String dataStorePath, T dataRoot) {
-		MicroStreamController<T> microStreamController = new MicroStreamController<T>();
-		microStreamController.connect(dataStorePath);
-		microStreamController.setDataRoot((T)microStreamController.getStorageManager().root());
-		return microStreamController;
-	}
-
-	public void setDataRoot(T dataRoot) {
-		this.dataRoot = dataRoot;
-	}
-
-	public T getDataRoot() {
-		return dataRoot;
+		storageManager.shutdown();
 	}
 
 	public EmbeddedStorageManager getStorageManager() {
@@ -81,6 +59,14 @@ public class MicroStreamController<T> {
 
 	public void setStorageManager(EmbeddedStorageManager storageManager) {
 		this.storageManager = storageManager;
+	}
+
+	public void setDataRoot(Object dataRoot) {
+		this.dataRoot = dataRoot;
+	}
+
+	public Object getDataRoot() {
+		return dataRoot;
 	}
 
 }

@@ -35,7 +35,7 @@ public class DataStoreContentGuiController {
 
 	private DataStorageProfile dataStoreaDataStorageProfile;
 
-	private MicroStreamController<?> microStreamController;
+	private MicroStreamController microStreamController;
 
 	/**
 	 * Navigates back to chooseProfile dialogue.
@@ -87,11 +87,11 @@ public class DataStoreContentGuiController {
 		this.dataStoreaDataStorageProfile = dataStoreaDataStorageProfile;
 	}
 
-	public MicroStreamController<?> getMicroStreamController() {
+	public MicroStreamController getMicroStreamController() {
 		return microStreamController;
 	}
 
-	public void setMicroStreamController(MicroStreamController<?> microStreamController) {
+	public void setMicroStreamController(MicroStreamController microStreamController) {
 		this.microStreamController = microStreamController;
 	}
 

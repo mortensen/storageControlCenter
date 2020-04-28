@@ -315,8 +315,8 @@ public class ChooseProfileGuiController {
 	 */
 	private TreeView<String> generateDataStoreTreeView(DataStorageProfile selectedProfile,
 			DataStoreContentGuiController dataStoreContentGuiController) {
-		
-		//load persistent profile
+
+		// load persistent profile
 		selectedProfile = profileController.loadPersistentProfile(selectedProfile);
 		String jarPath = selectedProfile.getJarPath();
 		String dataRootClassName = selectedProfile.getDataRootClassName();
@@ -328,11 +328,12 @@ public class ChooseProfileGuiController {
 			return null;
 		}
 
-		//instantiate microStream controller and connect to configured external application database
-		MicroStreamController<?> microStreamController = MicroStreamController
-				.generateMicroStreamController(selectedProfile.getDataStorePath(), dataRootClass);
+		// instantiate microStream controller and connect to configured external
+		// application database
+		MicroStreamController microStreamController = new MicroStreamController();
+		//microStreamController.connect(selectedProfile.getDataStorePath(), jarPath);
 		dataStoreContentGuiController.setMicroStreamController(microStreamController);
-		
+
 		// create a JavaFX tree root item
 		TreeView<String> treeView = new TreeView<String>();
 		TreeItem<String> rootItem = new TreeItem<String>(dataRootClassName, null);
