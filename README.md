@@ -15,3 +15,4 @@ Wo ist die DB? (für microstream)
 
 
 
+Mögliche Voraussetzung: export all im Package des Jars
