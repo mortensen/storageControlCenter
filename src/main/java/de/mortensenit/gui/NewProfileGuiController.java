@@ -34,6 +34,9 @@ public class NewProfileGuiController {
 	private TextField dataStorePath;
 
 	@FXML
+	private TextField packageName;
+
+	@FXML
 	private Button saveButton;
 
 	@FXML
@@ -57,6 +60,8 @@ public class NewProfileGuiController {
 		logOutput.append(dataRootClassName.getText());
 		logOutput.append(" and dataStore path ");
 		logOutput.append(dataStorePath.getText());
+		logOutput.append(" and package name ");
+		logOutput.append(packageName.getText());
 		logger.info(logOutput.toString());
 
 		DataStorageProfile profile = new DataStorageProfile();
@@ -64,6 +69,7 @@ public class NewProfileGuiController {
 		profile.setJarPath(jarPath.getText());
 		profile.setDataRootClassName(dataRootClassName.getText());
 		profile.setDataStorePath(dataStorePath.getText());
+		profile.setPackageName(packageName.getText());
 		profileController.save(profile);
 
 		Stage currentStage = JavaFXHelper.getStageFromEvent(event);
