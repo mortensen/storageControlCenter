@@ -334,7 +334,8 @@ public class ChooseProfileGuiController {
 		// instantiate microStream controller and connect to configured external
 		// application database
 		MicroStreamController microStreamController = new MicroStreamController();
-		// microStreamController.connect(selectedProfile.getDataStorePath(), jarPath);
+		String packageName = selectedProfile.getPackageName();
+		microStreamController.connect(selectedProfile.getDataStorePath(), jarPath, packageName);
 		dataStoreContentGuiController.setMicroStreamController(microStreamController);
 
 		// create a JavaFX tree root item
