@@ -1,18 +1,7 @@
-# storageControlCenter
+# StorageControlCenter
+
+My little playground for MicroStream.
+No warranties. This is not supported and not finished software.
+
 
 clean compile javafx:jlink
-
-
-Wo ist die Anwendung? (für JarUtils)
-/home/fred/Desktop/exampleApp.jar
-
-Welches ist die DataStore Klasse? (für Reflection)
-jar -> DataStore class
-
-Wo ist die DB? (für microstream)
-/home/fred/microstream/exampleApp/... channels
-
-
-
-
-Mögliche Voraussetzung: export all im Package des Jars
