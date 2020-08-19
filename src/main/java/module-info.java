@@ -20,5 +20,8 @@ module scc {
 
 	// microstream
 	requires one.microstream.all;
+	requires transitive storage.restservice;
+	requires transitive storage.restservice.sparkjava;
+	requires transitive spark.core;
 
 }

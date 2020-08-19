@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.mortensenit.model.DataStorageProfile;
+import de.mortensenit.persistence.MicroStreamController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -33,6 +34,8 @@ public class DataStoreContentGuiController {
 	private Button closeButton;
 
 	private DataStorageProfile dataStoreaDataStorageProfile;
+
+	private MicroStreamController microStreamController;
 
 	/**
 	 * Navigates back to chooseProfile dialogue.
@@ -82,6 +85,14 @@ public class DataStoreContentGuiController {
 
 	public void setDataStoreaDataStorageProfile(DataStorageProfile dataStoreaDataStorageProfile) {
 		this.dataStoreaDataStorageProfile = dataStoreaDataStorageProfile;
+	}
+
+	public MicroStreamController getMicroStreamController() {
+		return microStreamController;
+	}
+
+	public void setMicroStreamController(MicroStreamController microStreamController) {
+		this.microStreamController = microStreamController;
 	}
 
 }

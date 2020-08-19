@@ -77,7 +77,8 @@ public class ProfileController {
 	/**
 	 * Update an existing profile in the datastore
 	 * 
-	 * @param profile the datastore profile that needs to be updated
+	 * @param profile the datastore profile that was clicked in the profile list and
+	 *                needs to be updated
 	 */
 	public void update(DataStorageProfile profile) {
 		if (PersistenceController.getInstance().root() == null) {
@@ -119,7 +120,8 @@ public class ProfileController {
 	/**
 	 * Delete the chosen profile from the datastore.
 	 * 
-	 * @param selectedProfile
+	 * @param selectedProfile the datastore profile that was clicked in the profile
+	 *                        list and needs to be deleted
 	 */
 	public void delete(DataStorageProfile selectedProfile) {
 		if (PersistenceController.getInstance().root() == null) {
@@ -140,6 +142,28 @@ public class ProfileController {
 		} else {
 			logger.error("Could not find a matching entry to delete.");
 		}
+	}
+
+	/**
+	 * load the persistent profile by its name
+	 * 
+	 * @param selectedProfile the datastore profile that was clicked in the profile
+	 *                        list and needs to be loaded
+	 * @return the persistent profile
+	 */
+	public DataStorageProfile loadPersistentProfile(DataStorageProfile selectedProfile) {
+		String profileName = selectedProfile.getProfileName();
+		logger.info("Loading persistent profile " + profileName);
+		PersistenceController persistenceController = PersistenceController.getInstance();
+		List<DataStorageProfile> profiles = persistenceController.root().getProfiles();
+
+		for (DataStorageProfile profile : profiles) {
+			if (profile.getProfileName().equals(profileName)) {
+				selectedProfile = profile;
+				break;
+			}
+		}
+		return selectedProfile;
 	}
 
 }

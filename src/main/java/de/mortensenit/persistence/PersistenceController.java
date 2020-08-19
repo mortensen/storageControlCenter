@@ -7,7 +7,11 @@ import org.apache.logging.log4j.Logger;
 
 import one.microstream.reference.LazyReferenceManager;
 import one.microstream.storage.configuration.Configuration;
+import one.microstream.storage.restservice.StorageRestService;
+import one.microstream.storage.restservice.StorageRestServiceResolver;
+import one.microstream.storage.restservice.sparkjava.StorageRestServiceSparkJava;
 import one.microstream.storage.types.EmbeddedStorageManager;
+import spark.Service;
 
 /**
  * This class loads, saves and updates all objects that need serialization from
@@ -51,7 +55,6 @@ public class PersistenceController {
 	 */
 	public void initDatastore() {
 		logger.info("Initializing datastore...");
-		// TODO: maybe make configurable
 		initDatastore("microstream/scc");
 	}
 
@@ -81,6 +84,15 @@ public class PersistenceController {
 			storageManager.setRoot(dataRoot);
 			storageManager.storeRoot();
 		}
+
+		//configure REST interface with spark as mentioned in the docs
+		StorageRestService service = StorageRestServiceResolver.resolve(storageManager);
+		service.start();
+
+		StorageRestServiceSparkJava sparkService = StorageRestServiceSparkJava.New(storageManager);
+		sparkService.setSparkService(Service.ignite().port(8080));
+		sparkService.setInstanceName("scc");
+		sparkService.start();
 
 		// Start lazy reference management with timeout after
 		// 10 minutes without any access. This will start a new thread.
